@@ -244,3 +244,39 @@ Still thin or absent: `stripe/`, `linear/`, `vercel/`, `porsche/` are empty, and
 there is exactly one shipped analytics dashboard. Type and color remain undecided
 for the same reason as the first pass — the evidence is about marketing surfaces,
 and ProfitMe is a working tool someone opens daily.
+
+---
+
+## 2026-08-01 — v1 design system synthesis
+
+No new assets. This pass closed the remaining `TBD` sections in
+`design-system.md` — color, typography, spacing, radius/elevation, component
+conventions, layout — using the full evidence gathered across the first three
+passes, plus explicit domain reasoning where the references are silent (marketing
+sites don't constrain a daily-use analytics tool's density or type scale on
+their own).
+
+**The color decision is the one worth flagging on its own.** Blue-on-neutral now
+appears in Tesla, Mercedes, Spline *and* Verdikt — four of nine shipped sources,
+independently. That crosses from "one popular choice" to "the default," which
+means it's disqualified as ProfitMe's accent by the originality rules' own logic:
+a direction shared by the majority of the reference set isn't synthesis, it's
+consensus, and consensus is what "never generic" is defined against. Copper was
+chosen instead — Porsche/Apple's *material* register rather than any brand's
+literal palette, unclaimed across the whole library, and deliberately kept out of
+the green/red semantic hues so brand identity and P&L status never share a
+lookup.
+
+Everything else in this pass extends prior findings rather than introducing new
+ones: the pill-for-interactive / small-radius-for-containers split, confirmed
+across five sources now (Tesla, Audi, Verdikt, the logistics concept, and by
+absence — nobody in the library puts a pill on a card); the dark-vs-light
+elevation split, which keeps Spline/Verdikt's border-and-lift technique for dark
+and the logistics concept's diffuse shadow for light rather than forcing one
+ramp onto both; and a single-typeface direction over Mercedes' serif/sans split,
+on the reasoning that a serif reads editorial in a tool opened daily rather than
+premium.
+
+**What this pass did not do:** invent evidence. Where the library is genuinely
+silent — a specific typeface file, exact chart color mappings, table row
+density — the design system says so rather than presenting a guess as derived.
