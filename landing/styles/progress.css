@@ -1,0 +1,107 @@
+/* ============================================================================
+   Scroll progress indicator
+   ---------------------------------------------------------------------------
+   Three stacked layers, all driven by the same scaleX so they stay locked
+   together, and all compositor-only:
+
+     glow  — a duplicate of the bar carrying a CONSTANT filter: blur().
+             A constant filter rasterises once into its own layer; after that
+             the layer is only transformed, which costs nothing per frame.
+             This is the only way to have "blur" and "never lag" at once —
+             animating the blur radius would re-rasterise every frame.
+     bar   — the crisp line itself.
+     head  — a small bright cap that rides the leading edge, translated
+             rather than positioned, so it never triggers layout.
+
+   Nothing here reads or writes layout properties while scrolling. The only
+   values JS touches are transform and opacity.
+   ========================================================================== */
+
+.progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  /* Very thin. 2px reads as a deliberate hairline; 3px on coarse pointers
+     where it would otherwise be easy to miss. */
+  height: 2px;
+  /* Above the nav — this is the topmost thing on the page. */
+  z-index: 60;
+  pointer-events: none;
+  /* Contain the head's glow so it cannot spill into a scrollbar. */
+  overflow: hidden;
+  /* No track. A visible rail under a 2px line reads as chrome, and the nav's
+     own edge already provides the horizontal structure. */
+}
+
+@media (pointer: coarse) {
+  .progress {
+    height: 3px;
+  }
+}
+
+.progress__glow,
+.progress__bar {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  /* Start empty. JS writes scaleX from the real scroll position on init, so a
+     restored mid-page scroll shows the correct fill immediately. */
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+.progress__glow {
+  background: var(--accent);
+  /* Constant — never animated. See the note at the top of this file. */
+  filter: blur(6px);
+  opacity: var(--progress-glow, 0.35);
+  /* Opacity is the only thing that responds to velocity, and opacity is
+     composited, so the response is free. */
+  transition: opacity 220ms var(--ease-standard);
+}
+
+.progress__bar {
+  /* The line brightens along its length, so the leading edge is the brightest
+     point even before the head cap. Static gradient, no cost. */
+  background: linear-gradient(
+    90deg,
+    var(--copper-600) 0%,
+    var(--accent) 55%,
+    var(--copper-400) 100%
+  );
+}
+
+.progress__head {
+  position: absolute;
+  inset-block: -2px;
+  inset-inline-start: 0;
+  width: 14px;
+  margin-inline-start: -14px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--copper-400) 70%,
+    hsl(30 60% 88%) 100%
+  );
+  filter: blur(1.5px);
+  opacity: var(--progress-head, 0);
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  transition: opacity 260ms var(--ease-standard);
+}
+
+/* At rest the bar stays visible but the glow and head recede, so a stationary
+   page shows a calm hairline rather than a lit-up strip. */
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__glow,
+  .progress__head {
+    display: none;
+  }
+
+  .progress__bar {
+    /* Position still communicated, just without the atmosphere. */
+    background: var(--accent);
+  }
+}

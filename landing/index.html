@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="styles/base.css" />
     <link rel="stylesheet" href="styles/hero.css" />
     <link rel="stylesheet" href="styles/sections.css" />
+    <link rel="stylesheet" href="styles/progress.css" />
     <noscript>
       <style>
         /* Resting states are applied by GSAP, so nothing is hidden by CSS.
@@ -59,6 +60,17 @@
     </noscript>
   </head>
   <body>
+    <!-- ===================================================================
+         SCROLL PROGRESS — topmost element, above the nav
+         Decorative: it duplicates information the scrollbar already conveys,
+         so it is hidden from assistive tech rather than announced twice.
+         =================================================================== -->
+    <div class="progress" data-progress aria-hidden="true">
+      <span class="progress__glow"></span>
+      <span class="progress__bar"></span>
+      <span class="progress__head"></span>
+    </div>
+
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- ===================================================================
@@ -845,6 +857,7 @@
     <script src="vendor/ScrollTrigger.min.js"></script>
     <script src="scripts/stage.js"></script>
     <script src="scripts/scroll.js"></script>
+    <script src="scripts/progress.js"></script>
     <script src="scripts/physics.js"></script>
   </body>
 </html>
