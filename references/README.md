@@ -1,12 +1,16 @@
 # Design References
 
-Visual research library for ProfitMe. Screenshots, GIFs and videos of products
-whose craft we want to match.
+The single source of truth for ProfitMe's design system. Two layers:
 
-**These are references, not templates.** Nothing here gets copied — not a
+**[`design-system.md`](design-system.md)** — the derived, decided tokens for
+this product: color, type, space, radius, shadow, motion. This is the canonical
+layer. Components build from it. When a component needs a value it doesn't have,
+the value gets derived and added here rather than improvised in a component file.
+
+**The subfolders** — raw screenshots, GIFs and video of products whose craft we
+want to match. **References, not templates.** Nothing here gets copied — not a
 layout, not a component, not a color ramp, not a marketing line. The job is to
-extract *principles* and re-synthesize them into something that is
-unmistakably ProfitMe.
+extract *principles* and re-synthesize them into something unmistakably ProfitMe.
 
 ## Structure
 
@@ -34,7 +38,10 @@ colors"), add a line to the folder's `NOTES.md` or just say it in chat.
 
 ## The workflow
 
-Whenever a page is designed or improved, every asset in `references/` gets
-analyzed first. The extraction dimensions and the rules that keep output
-original are specified in [`../CLAUDE.md`](../CLAUDE.md) under *Design
-Workflow* — that file is the contract, this one is the map.
+Every new UI component starts from `design-system.md`. Every page design or
+improvement starts from a full read of every asset in these folders, and folds
+what it learns back into `design-system.md`.
+
+Both paths, the extraction dimensions, and the rules that keep output original
+are specified in [`../CLAUDE.md`](../CLAUDE.md) under *Design Workflow* — that
+file is the contract, this one is the map.
