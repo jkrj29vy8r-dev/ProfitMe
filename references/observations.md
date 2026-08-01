@@ -144,11 +144,13 @@ scan affordance, and the submit button living inside the field; and a
 "Synthesizing…" loading state that names what is happening instead of showing a
 bare spinner.
 
-> **Provenance:** Verdikt is deployed at a Vercel preview URL and two files are
-> named `dash-filled.png` / `dash-mobile.png`, i.e. exported design artifacts.
-> This looks first-party. If it is, it is a consistency baseline rather than a
-> reference, and its palette may be intentionally shared with ProfitMe rather than
-> deliberately avoided. Unresolved — see the note in `dashboards/README.md`.
+> **Provenance: resolved 2026-08-01.** Verdikt is first-party but a deliberately
+> separate product. Structure transfers, surface does not: take the module-card
+> system, eyebrow labels, entry choreography, sample-data state and reflow
+> behavior; give ProfitMe its own palette and type voice so the two never read as
+> the same product. This also means Verdikt's blue-cyan accent goes on the avoid
+> list alongside the others — for a different reason than Apple's or Tesla's, but
+> the same outcome.
 
 ### Dribbble concept shots — filed at lower weight
 

@@ -40,6 +40,14 @@ but an undescriptive name is far better than not adding the asset.
 
 Accepted: `.png` `.jpg` `.webp` `.gif` `.mp4` `.mov` `.webm`
 
+> **Storage: Git LFS is the intended home for this media, and is not set up yet.**
+> The migration was prepared and verified locally but could not be pushed —
+> `lfs.github.com` is blocked by this workspace's egress policy, so LFS objects
+> cannot upload from an agent session. Until that host is allowed, media is
+> committed as ordinary git blobs and the folder grows the repo permanently.
+> Running `git lfs migrate import --include="references/**"` from a machine with
+> normal network access will complete the move.
+
 If an asset needs context ("look at the easing on the card lift, not the
 colors"), add a line to the folder's `NOTES.md` or just say it in chat.
 

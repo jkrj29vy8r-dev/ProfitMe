@@ -25,7 +25,9 @@ The mid-load capture is the most valuable one in the folder: it catches the
 dashboard *before* its data animates in, which makes the entry choreography
 readable when set against the settled frame.
 
-> **Provenance caveat:** Verdikt appears to be a first-party or closely related
-> product, not a third-party reference. If so it is a **consistency baseline**
-> rather than inspiration, and the no-copying rule does not apply to it the way
-> it applies to Apple or Rimac. Confirm before treating it either way.
+> **Provenance: first-party, kept visually distinct** (confirmed 2026-08-01).
+> Verdikt is the same owner's product but a separate one. Take its **structural**
+> patterns freely — module cards, eyebrow labels, entry choreography, sample-data
+> state, reflow behavior. Do **not** carry over its palette or type voice:
+> ProfitMe gets its own, so the two never read as the same product. The
+> originality rules apply to Verdikt's surface, not to its structure.
