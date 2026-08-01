@@ -88,3 +88,86 @@ The `dashboards/` folder is still empty, so the surfaces that matter most for an
 analytics product have no reference coverage yet. Type and color tokens stay
 undecided until there is either dashboard reference material or a ProfitMe brand
 decision to derive from.
+
+---
+
+## 2026-08-01 — second pass (8 new assets)
+
+Five of the thirteen files in this batch were re-uploads of assets already filed;
+deduplicated by hash before analysis. The eight new ones split into two very
+different classes of evidence.
+
+### Verdikt dashboard — the `dashboards/` gap, filled
+
+Four stills and a flow video of a dark analytics dashboard for an AI
+vehicle-intelligence product. This is the first genuinely data-dense product UI in
+the library and the closest thing here to ProfitMe's actual job.
+
+**Entry choreography** — readable because one capture happens to catch the
+dashboard mid-load, before its data settles:
+
+- Progress bars sit at zero and grow to value.
+- The area chart is empty and draws in.
+- The activity timeline is absent and populates.
+- The radial score gauge arc sweeps to position.
+- The live counter ("analyses / hour") ticks — it read 1,221 / 1,238 / 1,274
+  across three captures seconds apart.
+
+So: **data animates to its value on mount rather than appearing pre-filled.** Every
+module carries its own entry, and the page assembles rather than switching on.
+This is the same staggered-reveal principle already derived from Apple and Rimac,
+applied to data rather than to menu items — which is a strong sign the principle
+generalizes.
+
+**Structure** — a module-card system on near-black, each card carrying a small
+uppercase letterspaced eyebrow ("COMMAND CENTER", "INTERACTIVE SCORE", "VERDICT
+MIX", "PREMIUM ANALYTICS", "VEHICLE HEALTH", "ACTIVITY") above a plain-language
+title. The eyebrow does the categorization so the title can stay human. Cards
+separate from the background by a subtle border plus a slight surface lift — the
+same dark-UI depth technique noted on Spline, confirmed here in a product context.
+
+**Semantic status** — a green/amber/red trio runs consistently across dots,
+numerals, the distribution bar and the timeline. Notably the numeral itself is
+colored, not just an adjacent dot. **This is the accessibility trap named in
+`CLAUDE.md`:** score 47 in red and 84 in green differ *only* by hue in the ranked
+list. ProfitMe must pair status with a shape, icon or label, since profit and loss
+carry the same risk.
+
+**Responsive** — the narrow layout stacks every module to one column and drops the
+KPI row from four across to a 2×2 grid. Nothing is hidden; the composition
+reflows. Worth following.
+
+**Other details worth keeping:** a "Preview / Sample data — run a verdict to make
+it yours" chip, which is the *not enough data yet* state solved gracefully rather
+than with an empty panel; the VIN input with an inline character counter (0/17), a
+scan affordance, and the submit button living inside the field; and a
+"Synthesizing…" loading state that names what is happening instead of showing a
+bare spinner.
+
+> **Provenance:** Verdikt is deployed at a Vercel preview URL and two files are
+> named `dash-filled.png` / `dash-mobile.png`, i.e. exported design artifacts.
+> This looks first-party. If it is, it is a consistency baseline rather than a
+> reference, and its palette may be intentionally shared with ProfitMe rather than
+> deliberately avoided. Unresolved — see the note in `dashboards/README.md`.
+
+### Dribbble concept shots — filed at lower weight
+
+Three captures of a car-rental landing concept. Filed in `concepts/` with a README
+explaining why portfolio work does not carry the same evidentiary weight as
+shipped product.
+
+Being straight about it: this shot contains several things already on the
+*generic* list in `CLAUDE.md` — a bento grid of stock photography, one saturated
+red applied decoratively to every surface, and four equal icon-topped feature
+cards. It is a useful contrast case precisely because it looks impressive as a
+static image and would not survive as a product.
+
+Two ideas are worth keeping: reducing a multi-step process to four labelled steps,
+and floating the search control over the bottom edge of the hero so it bridges two
+sections instead of sitting inside one.
+
+### Cross-cutting
+
+The blue-accent-on-neutral observation from the first pass now holds across seven
+of nine sources, Verdikt included. Continuing to treat it as a structural
+principle to keep and a specific color to avoid.

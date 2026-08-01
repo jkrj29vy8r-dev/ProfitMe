@@ -105,6 +105,12 @@ ease-in-out, and nothing springs or bounces.
    empty state is designed — never an accidental blank.
 7. Under `prefers-reduced-motion`, stagger goes to 0 and durations collapse to
    `motion-instant`; the state change still reads, it just stops moving.
+8. **Data animates to its value on mount.** Bars grow from zero, area charts draw,
+   gauges sweep, lists populate in cascade. A dashboard assembles rather than
+   switching on. Confirmed against a mid-load capture in `dashboards/`. This is
+   principle 2 applied to data instead of menu items — the cascade generalizes.
+   It runs once on mount, never on every re-render, and never on a value update
+   (a changing number tweens, it does not re-grow from zero).
 
 ## Component conventions — TBD
 
@@ -112,6 +118,33 @@ Shared rules every component honors: focus ring treatment, disabled treatment,
 hit-target minimum, icon sizing and optical alignment, and the required states —
 default, hover, focus, active, disabled, loading, empty, error, and the
 "not enough data yet" case specific to analytics.
+
+## Data display — partially derived (2026-08-01)
+
+Structural patterns from the `dashboards/` reference. Values still TBD; the
+structure is decided.
+
+- **Module cards.** Each analytical unit is a card on the page background,
+  separated by a subtle border plus a slight surface lift rather than a heavy
+  shadow. Depth on dark comes from border and surface value, not from shadow
+  spread.
+- **Eyebrow + title.** A small uppercase letterspaced category label sits above a
+  plain-language title. The eyebrow classifies so the title can stay human. Adopt
+  this — it lets a dense page stay scannable without shouting headings.
+- **Status trio.** One semantic set (positive / caution / negative) applied
+  consistently across dots, numerals, distribution bars and timelines. **Never
+  hue alone:** every status carries a shape, icon or label as well. Two values
+  that differ only in color are a defect, and profit/loss is exactly where this
+  bites.
+- **Numbers.** Tabular figures everywhere. The metric is the largest thing in its
+  card; its unit and qualifier sit smaller and quieter beside it.
+- **Sample-data state.** The "not enough data yet" case is a labelled preview with
+  representative data and a clear call to make it real — never a blank panel.
+  This is the state analytics products most often skip and the one ProfitMe
+  should get visibly right.
+- **Reflow, don't hide.** Narrow layouts stack modules to one column and drop KPI
+  rows to a 2×2 grid. Nothing is dropped on small screens; the composition
+  reflows.
 
 ## Layout — TBD
 

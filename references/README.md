@@ -30,6 +30,7 @@ extract *principles* and re-synthesize them into something unmistakably ProfitMe
 | `vercel/`      | Monochrome systems, dashboards, empty states, deployment UI             |
 | `animations/`  | Motion studies — easing, transitions, micro-interactions, scroll effects |
 | `dashboards/`  | Data-dense layouts, charts, tables, filters, analytics IA               |
+| `concepts/`    | Dribbble/portfolio work — lower evidentiary weight, see folder README   |
 
 ## How to add assets
 
