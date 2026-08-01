@@ -7,6 +7,9 @@ this product: color, type, space, radius, shadow, motion. This is the canonical
 layer. Components build from it. When a component needs a value it doesn't have,
 the value gets derived and added here rather than improvised in a component file.
 
+**[`observations.md`](observations.md)** — the working layer between them. Dated
+findings from each analysis pass, with the evidence that produced them.
+
 **The subfolders** — raw screenshots, GIFs and video of products whose craft we
 want to match. **References, not templates.** Nothing here gets copied — not a
 layout, not a component, not a color ramp, not a marketing line. The job is to
@@ -17,6 +20,9 @@ extract *principles* and re-synthesize them into something unmistakably ProfitMe
 | Folder         | What goes here                                                          |
 | -------------- | ----------------------------------------------------------------------- |
 | `apple/`       | Product pages, scroll narratives, typography, restraint                 |
+| `mercedes/`    | Serif-over-sans hierarchy, calm density, quiet controls                 |
+| `rimac/`       | Dark craft, section transitions, staggered reveals — best motion source |
+| `spline/`      | Dark SaaS marketing, elevated panels, interactive hero                  |
 | `tesla/`       | Configurators, minimal chrome, full-bleed imagery                       |
 | `porsche/`     | Luxury detail, material feel, precision layout                          |
 | `stripe/`      | Developer-grade UI, docs, gradients, information density done well      |

@@ -3,10 +3,12 @@
 The derived layer. Raw assets in the sibling folders are inspiration; **this file
 is the contract.** Every UI component builds from these tokens.
 
-> **Status: not yet derived.** No assets have been added and no app code exists.
-> Every section below is a placeholder marked `TBD`. Values get filled in on the
-> first real design pass, derived from `references/` — not guessed, and not
-> inherited from a UI library's defaults.
+> **Status: partially derived.** Motion is derived from measured evidence — see
+> [`observations.md`](observations.md), 2026-08-01. Everything else is still
+> `TBD`: the current references are marketing and configurator surfaces, not
+> data-dense product UI, so they do not yet constrain ProfitMe's color, type or
+> spacing. Those get filled in from dashboard references or a brand decision,
+> not guessed and not inherited from a UI library's defaults.
 
 ## How this file is maintained
 
@@ -56,12 +58,53 @@ read, and the solid fallback. Glass is for surfaces floating above content only.
 Record the worst-case backdrop each glass surface must stay legible over —
 contrast gets verified against that, not against a favorable screenshot.
 
-## Motion — TBD
+## Motion — derived (2026-08-01)
 
-Duration scale (fast / base / slow) and what each is for. Easing curves by
-purpose — entry, exit, hover, layout change. Stagger interval. All motion
-interruptible, animating transform and opacity, and reduced under
-`prefers-reduced-motion`.
+Measured from 60fps captures of apple.com and rimac-automobili.com, which
+converge on the same reveal pattern independently. Evidence in
+[`observations.md`](observations.md).
+
+### Duration
+
+| Token             | Value | For                                                    |
+| ----------------- | ----- | ------------------------------------------------------ |
+| `motion-instant`  | 100ms | State flips that must feel like nothing — checkbox, tab |
+| `motion-fast`     | 180ms | Hover, focus, small property changes                    |
+| `motion-base`     | 260ms | The default: panels, popovers, disclosure               |
+| `motion-slow`     | 420ms | Full-surface transitions, route changes                 |
+| `motion-stagger`  | 40ms  | Interval between adjacent items in a cascade            |
+
+A staggered group of ~8 items therefore resolves in roughly 500ms end to end,
+matching both references.
+
+### Easing
+
+| Token            | Curve                              | For                          |
+| ---------------- | ---------------------------------- | ---------------------------- |
+| `ease-entry`     | `cubic-bezier(0.16, 1, 0.3, 1)`    | Things arriving — decelerate |
+| `ease-exit`      | `cubic-bezier(0.4, 0, 1, 1)`       | Things leaving — accelerate  |
+| `ease-standard`  | `cubic-bezier(0.4, 0, 0.2, 1)`     | Property changes in place    |
+
+Entry and exit are deliberately different curves. Nothing uses a symmetric
+ease-in-out, and nothing springs or bounces.
+
+### Principles — these carry more weight than the numbers
+
+1. **Reveal with opacity, not translation.** Neither reference slides, springs,
+   scales or bounces its menu items — they materialize in place. The slide-in
+   with a spring is the generic move and is banned by default. Transform is for
+   elements that genuinely move through space, not for making a list appear.
+2. **Cascade top to bottom** at `motion-stagger`. Never reveal a group at once.
+3. **Overlap transitions.** The outgoing element fades out *while* the incoming
+   one fades in. Sequential out-then-in reads slow and cheap.
+4. **Morph, don't swap,** on paired icons — hamburger↔close, play↔pause,
+   chevron rotation.
+5. **Interruptible always.** Reversing mid-animation continues from the current
+   value and never snaps.
+6. **A hold is a decision.** If a surface must sit empty while data loads, that
+   empty state is designed — never an accidental blank.
+7. Under `prefers-reduced-motion`, stagger goes to 0 and durations collapse to
+   `motion-instant`; the state change still reads, it just stops moving.
 
 ## Component conventions — TBD
 
