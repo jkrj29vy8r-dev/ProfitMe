@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ProfitMe — See the profit behind the revenue</title>
+    <meta
+      name="description"
+      content="ProfitMe turns revenue into margin you can act on. Product-level profit, cash timing, and anomalies — in one place."
+    />
+    <script>
+      /* Resolve theme before first paint — a stored choice wins over the OS
+         preference. Inline and synchronous on purpose: deferring this to
+         DOMContentLoaded shows the wrong theme for a frame. */
+      (function () {
+        /* If an embedding context already stamped a theme, respect it. */
+        if (document.documentElement.getAttribute("data-theme")) return;
+        try {
+          var stored = localStorage.getItem("profitme-theme");
+          if (stored) {
+            document.documentElement.setAttribute("data-theme", stored);
+            return;
+          }
+        } catch (e) {}
+        document.documentElement.setAttribute(
+          "data-theme",
+          window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark"
+        );
+      })();
+    </script>
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/hero.css" />
+    <link rel="stylesheet" href="styles/sections.css" />
+    <noscript>
+      <style>
+        /* Reveals are JS-driven. With scripting off, show everything at rest
+           rather than leaving the page blank, and drop the ambient motion. */
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        .float {
+          animation: none !important;
+          opacity: var(--rest-opacity, 1) !important;
+        }
+        .chart__line {
+          animation: none !important;
+          stroke-dashoffset: 0 !important;
+        }
+        .rail__fill,
+        .mrow__bar span,
+        .waterfall__bar {
+          --grown: 100%;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ===================================================================
+         NAV
+         =================================================================== -->
+    <header class="nav" data-nav>
+      <div class="container nav__inner">
+        <a class="nav__brand" href="#top">
+          <svg class="nav__mark" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 18V9.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M15 18V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v12"
+              fill="none"
+              stroke="var(--accent)"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M2 21h20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              opacity="0.4"
+            />
+          </svg>
+          ProfitMe
+        </a>
+
+        <nav class="nav__links" aria-label="Primary">
+          <a class="nav__link" href="#argument">Why</a>
+          <a class="nav__link" href="#product">Product</a>
+          <a class="nav__link" href="#chapters">Features</a>
+          <a class="nav__link" href="#trust">Security</a>
+        </nav>
+
+        <div class="nav__actions">
+          <button
+            class="theme-toggle"
+            data-theme-toggle
+            type="button"
+            aria-pressed="false"
+            aria-label="Switch to light theme"
+          >
+            <span class="theme-toggle__icons" aria-hidden="true">
+              <svg class="icon-moon" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M17 11.5A7.5 7.5 0 0 1 8.5 3a7.5 7.5 0 1 0 8.5 8.5Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <svg class="icon-sun" viewBox="0 0 20 20" fill="none">
+                <circle
+                  cx="10"
+                  cy="10"
+                  r="3.6"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+                <path
+                  d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M15.9 4.1l-1.4 1.4M5.5 14.5l-1.4 1.4M15.9 15.9l-1.4-1.4M5.5 5.5 4.1 4.1"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </span>
+          </button>
+          <a class="btn btn--quiet" href="#close">Sign in</a>
+          <a class="btn btn--primary" href="#close">Start free</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- =================================================================
+           01 — HERO
+           =================================================================== -->
+      <section class="hero" id="top">
+        <div class="hero__wash"></div>
+        <div class="hero__grid"></div>
+
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <p class="t-label hero__eyebrow" data-reveal data-reveal-delay="0">
+              <span class="hero__eyebrow-dot"></span>
+              Profit intelligence
+            </p>
+
+            <h1
+              class="t-hero hero__title"
+              data-reveal
+              data-reveal-delay="80"
+            >
+              See the profit<br />behind the <em>revenue</em>.
+            </h1>
+
+            <p
+              class="t-body-lg hero__sub"
+              data-reveal
+              data-reveal-delay="160"
+            >
+              Revenue tells you the month was busy. ProfitMe tells you which
+              products, customers and invoices actually paid for it — down to
+              the line.
+            </p>
+
+            <div class="hero__actions" data-reveal data-reveal-delay="220">
+              <a class="btn btn--primary" href="#close">
+                Start free
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path
+                    d="M3 8h10M9 4l4 4-4 4"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </a>
+              <a class="btn btn--glass" href="#product">See it working</a>
+            </div>
+
+            <p class="t-caption hero__note" data-reveal data-reveal-delay="280">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M3 8.5l3.2 3L13 5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              No card required · Connects in under two minutes
+            </p>
+          </div>
+
+          <!-- The floating field ------------------------------------------->
+          <div class="field" data-field aria-hidden="true">
+            <!-- Currency marks: machined plaques, depth-layered -->
+            <div
+              class="float float--near"
+              data-float
+              data-depth="near"
+              style="--x: 6%; --y: 15%; --in-delay: 320ms"
+            >
+              <div class="coin coin--lg">€</div>
+            </div>
+
+            <div
+              class="float float--mid"
+              data-float
+              data-depth="mid"
+              style="--x: 90%; --y: 13%; --in-delay: 420ms"
+            >
+              <div class="coin coin--md">$</div>
+            </div>
+
+            <div
+              class="float float--far"
+              data-float
+              data-depth="far"
+              style="--x: 23%; --y: 84%; --in-delay: 560ms"
+            >
+              <div class="coin coin--sm">₿</div>
+            </div>
+
+            <!-- Financial chart -->
+            <div
+              class="float float--near"
+              data-float
+              data-depth="near"
+              style="--x: 74%; --y: 39%; --in-delay: 380ms"
+            >
+              <div class="chip">
+                <div class="chip__row">
+                  <div>
+                    <div class="chip__label">Gross margin</div>
+                    <div class="chip__value num">42.8%</div>
+                  </div>
+                  <div class="chip__delta chip__delta--up num">▲ 3.1</div>
+                </div>
+                <svg class="chip__spark" viewBox="0 0 110 26" preserveAspectRatio="none">
+                  <path d="M1 21 L14 18 L27 20 L40 13 L53 15 L66 9 L79 11 L92 5 L108 3" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Invoice -->
+            <div
+              class="float float--mid"
+              data-float
+              data-depth="mid"
+              style="--x: 3%; --y: 45%; --in-delay: 480ms"
+            >
+              <div class="doc">
+                <div class="doc__head">
+                  <span class="doc__tag">Invoice</span>
+                  <span class="doc__stamp">
+                    <svg width="8" height="8" viewBox="0 0 16 16" fill="none">
+                      <path
+                        d="M3 8.5l3.2 3L13 5"
+                        stroke="currentColor"
+                        stroke-width="2.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <div class="doc__line" style="width: 82%"></div>
+                <div class="doc__line" style="width: 64%"></div>
+                <div class="doc__line" style="width: 72%"></div>
+                <div class="doc__total">
+                  <span>Paid</span>
+                  <span class="num">€ 14,280</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Document -->
+            <div
+              class="float float--far"
+              data-float
+              data-depth="far"
+              style="--x: 85%; --y: 71%; --in-delay: 620ms"
+            >
+              <div class="doc">
+                <div class="doc__head">
+                  <span class="doc__tag">Q3 Close</span>
+                </div>
+                <div class="doc__line" style="width: 90%"></div>
+                <div class="doc__line" style="width: 55%"></div>
+                <div class="doc__line" style="width: 78%"></div>
+                <div class="doc__line" style="width: 40%"></div>
+              </div>
+            </div>
+
+            <!-- Bar chart -->
+            <div
+              class="float float--mid"
+              data-float
+              data-depth="mid"
+              style="--x: 6%; --y: 72%; --in-delay: 520ms"
+            >
+              <div class="chip" style="min-width: 116px">
+                <div class="chip__label">By product</div>
+                <div class="bars">
+                  <span style="height: 42%"></span>
+                  <span style="height: 66%"></span>
+                  <span style="height: 38%"></span>
+                  <span style="height: 84%"></span>
+                  <span style="height: 100%"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__cue" aria-hidden="true">
+          <span class="hero__cue-rail"></span>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           02 — PROOF STRIP
+           =================================================================== -->
+      <section class="proof" aria-label="Key numbers">
+        <div class="container proof__grid">
+          <div data-reveal>
+            <div class="proof__value num">
+              <span data-count="2.4" data-decimals="1" data-prefix="€" data-suffix="B">€0.0B</span>
+            </div>
+            <p class="proof__label">Revenue analysed</p>
+          </div>
+          <div data-reveal>
+            <div class="proof__value num">
+              <span data-count="11" data-suffix=" pts">0 pts</span>
+            </div>
+            <p class="proof__label">Median margin found</p>
+          </div>
+          <div data-reveal>
+            <div class="proof__value num">
+              <span data-count="94" data-suffix="s">0s</span>
+            </div>
+            <p class="proof__label">Average setup time</p>
+          </div>
+          <div data-reveal>
+            <div class="proof__value num">
+              <span data-count="1200" data-suffix="+">0+</span>
+            </div>
+            <p class="proof__label">Finance teams</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           03 — THE ARGUMENT
+           =================================================================== -->
+      <section class="section" id="argument">
+        <div class="container">
+          <div class="argument__head">
+            <h2 class="t-h1" data-reveal>Revenue is a headline. Profit is the story.</h2>
+            <p class="t-body-lg argument__lede" data-reveal>
+              Most tools stop at what came in. The gap between those two numbers
+              is where a business is actually won or lost — and it is almost
+              never where you expect.
+            </p>
+          </div>
+
+          <div class="compare">
+            <div class="compare__card" data-reveal>
+              <p class="t-label">Reported revenue</p>
+              <p class="compare__value num">
+                <span data-count="1840000" data-prefix="€">€0</span>
+              </p>
+              <div class="compare__meta">
+                <span class="pill pill--positive">Up 18% YoY</span>
+              </div>
+              <div class="rail">
+                <span class="rail__fill rail__fill--muted" data-grow="100%"></span>
+              </div>
+              <p class="compare__note">
+                The number that gets celebrated in the monthly review.
+              </p>
+            </div>
+
+            <div class="compare__card compare__card--accent" data-reveal>
+              <p class="t-label">Actual contribution</p>
+              <p class="compare__value num">
+                <span data-count="312000" data-prefix="€">€0</span>
+              </p>
+              <div class="compare__meta">
+                <span class="pill pill--caution">Down 4% YoY</span>
+              </div>
+              <div class="rail">
+                <span class="rail__fill" data-grow="17%" data-grow-delay="220"></span>
+              </div>
+              <p class="compare__note">
+                The number that decides whether next year happens. ProfitMe
+                surfaces it continuously, not at quarter close.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           04 — PRODUCT REVEAL
+           =================================================================== -->
+      <section class="reveal-stage" id="product">
+        <div class="container">
+          <div class="reveal-stage__head">
+            <h2 class="t-h1" data-reveal>Everything in one view.</h2>
+            <p class="t-body-lg reveal-stage__sub" data-reveal>
+              One screen that answers the only question that matters this
+              morning: what is actually making money right now.
+            </p>
+          </div>
+
+          <div class="frame" data-reveal>
+            <div class="frame__bar" aria-hidden="true">
+              <span class="frame__dot"></span>
+              <span class="frame__dot"></span>
+              <span class="frame__dot"></span>
+              <span class="frame__title">ProfitMe — Overview</span>
+            </div>
+
+            <div class="dash">
+              <div class="dash__top">
+                <div>
+                  <p class="panel__eyebrow">Command view</p>
+                  <p class="t-h3">October margin</p>
+                </div>
+                <span class="sample-note">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M8 7.2v4M8 5.2v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  </svg>
+                  Sample data — connect a source to make it yours
+                </span>
+              </div>
+
+              <div class="dash__kpis">
+                <div class="kpi">
+                  <p class="kpi__label">Revenue</p>
+                  <p class="kpi__value num">€184,200</p>
+                  <p class="kpi__delta kpi__delta--up num">▲ 18.2% vs Sep</p>
+                </div>
+                <div class="kpi">
+                  <p class="kpi__label">Gross margin</p>
+                  <p class="kpi__value num">42.8%</p>
+                  <p class="kpi__delta kpi__delta--up num">▲ 3.1 pts</p>
+                </div>
+                <div class="kpi">
+                  <p class="kpi__label">Contribution</p>
+                  <p class="kpi__value num">€31,240</p>
+                  <p class="kpi__delta kpi__delta--down num">▼ 4.0% vs Sep</p>
+                </div>
+                <div class="kpi">
+                  <p class="kpi__label">Cash gap</p>
+                  <p class="kpi__value num">38 days</p>
+                  <p class="kpi__delta kpi__delta--down num">▼ 6 days worse</p>
+                </div>
+              </div>
+
+              <div class="dash__panels">
+                <div class="panel panel--chart">
+                  <div class="panel__head">
+                    <div>
+                      <p class="panel__eyebrow">Trend</p>
+                      <p class="panel__title">Contribution margin, 12 months</p>
+                    </div>
+                    <span class="pill pill--positive">Improving</span>
+                  </div>
+                  <svg class="chart" viewBox="0 0 420 132" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="pmGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28" />
+                        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      class="chart__area"
+                      d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28 L418 132 L0 132 Z"
+                    />
+                    <path
+                      class="chart__line"
+                      style="--len: 460"
+                      d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28"
+                    />
+                    <circle class="chart__dot" cx="418" cy="28" r="4" />
+                  </svg>
+                </div>
+
+                <div class="panel">
+                  <div class="panel__head">
+                    <div>
+                      <p class="panel__eyebrow">Breakdown</p>
+                      <p class="panel__title">Margin by product</p>
+                    </div>
+                  </div>
+
+                  <div class="mrow">
+                    <div>
+                      <div class="mrow__name">Atlas Pro</div>
+                      <div class="mrow__sub">1,204 units</div>
+                    </div>
+                    <div class="mrow__val num">61%</div>
+                    <div class="mrow__bar">
+                      <span class="is-pos" data-grow="61%"></span>
+                    </div>
+                  </div>
+
+                  <div class="mrow">
+                    <div>
+                      <div class="mrow__name">Atlas Core</div>
+                      <div class="mrow__sub">3,880 units</div>
+                    </div>
+                    <div class="mrow__val num">38%</div>
+                    <div class="mrow__bar">
+                      <span class="is-pos" data-grow="38%" data-grow-delay="80"></span>
+                    </div>
+                  </div>
+
+                  <div class="mrow">
+                    <div>
+                      <div class="mrow__name">Onboarding</div>
+                      <div class="mrow__sub">Services</div>
+                    </div>
+                    <div class="mrow__val num">12%</div>
+                    <div class="mrow__bar">
+                      <span class="is-cau" data-grow="12%" data-grow-delay="160"></span>
+                    </div>
+                  </div>
+
+                  <div class="mrow">
+                    <div>
+                      <div class="mrow__name">Legacy plan</div>
+                      <div class="mrow__sub">412 accounts</div>
+                    </div>
+                    <div class="mrow__val num">−9%</div>
+                    <div class="mrow__bar">
+                      <span class="is-neg" data-grow="9%" data-grow-delay="240"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           05 — CHAPTERS
+           =================================================================== -->
+      <div class="container" id="chapters">
+        <!-- Chapter 01 -->
+        <section class="chapter">
+          <div class="chapter__copy">
+            <div class="chapter__index" data-reveal>
+              <span class="chapter__num">Margin</span>
+              <span class="chapter__rule"></span>
+            </div>
+            <h2 class="t-h2" data-reveal>Find the margin you are losing.</h2>
+            <p class="t-body-lg chapter__body" data-reveal>
+              ProfitMe allocates every cost — COGS, fees, refunds, support time
+              — back to the product and customer that caused it. The result is
+              a contribution figure per line, not a company-wide average that
+              hides the problem.
+            </p>
+            <ul class="chapter__list">
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Per-product and per-customer contribution
+              </li>
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Refunds and fees netted automatically
+              </li>
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Loss-making lines surfaced, not buried
+              </li>
+            </ul>
+          </div>
+
+          <div class="chapter__visual" data-reveal>
+            <p class="panel__eyebrow">Revenue → contribution</p>
+            <p class="panel__title">Where €184,200 goes</p>
+            <div class="waterfall">
+              <div class="waterfall__col">
+                <span class="waterfall__bar waterfall__bar--accent" data-grow="100%"></span>
+                <span class="waterfall__label">Revenue</span>
+              </div>
+              <div class="waterfall__col">
+                <span class="waterfall__bar waterfall__bar--neg" data-grow="52%" data-grow-delay="90"></span>
+                <span class="waterfall__label">COGS</span>
+              </div>
+              <div class="waterfall__col">
+                <span class="waterfall__bar waterfall__bar--neg" data-grow="17%" data-grow-delay="180"></span>
+                <span class="waterfall__label">Fees</span>
+              </div>
+              <div class="waterfall__col">
+                <span class="waterfall__bar waterfall__bar--neg" data-grow="14%" data-grow-delay="270"></span>
+                <span class="waterfall__label">Support</span>
+              </div>
+              <div class="waterfall__col">
+                <span class="waterfall__bar waterfall__bar--accent" data-grow="17%" data-grow-delay="360"></span>
+                <span class="waterfall__label">Left</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Chapter 02 -->
+        <section class="chapter chapter--flip">
+          <div class="chapter__copy">
+            <div class="chapter__index" data-reveal>
+              <span class="chapter__num">Cash</span>
+              <span class="chapter__rule"></span>
+            </div>
+            <h2 class="t-h2" data-reveal>Know when the money actually lands.</h2>
+            <p class="t-body-lg chapter__body" data-reveal>
+              A profitable month you cannot fund is still a problem. ProfitMe
+              maps every invoice to its expected settlement date, so the cash
+              gap is a number you plan around rather than discover.
+            </p>
+            <ul class="chapter__list">
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Expected settlement per invoice
+              </li>
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Runway impact modelled in real time
+              </li>
+            </ul>
+          </div>
+
+          <div class="chapter__visual" data-reveal>
+            <p class="panel__eyebrow">Cash timeline</p>
+            <p class="panel__title">Next 30 days</p>
+            <div class="timeline">
+              <div class="tl">
+                <span class="tl__dot" style="background: var(--positive)"></span>
+                <div>
+                  <div class="tl__name">Northwind Ltd</div>
+                  <div class="tl__when">Settles in 3 days</div>
+                </div>
+                <div class="tl__amt num">€24,100</div>
+              </div>
+              <div class="tl">
+                <span class="tl__dot" style="background: var(--positive)"></span>
+                <div>
+                  <div class="tl__name">Beacon Group</div>
+                  <div class="tl__when">Settles in 9 days</div>
+                </div>
+                <div class="tl__amt num">€8,640</div>
+              </div>
+              <div class="tl">
+                <span class="tl__dot" style="background: var(--caution)"></span>
+                <div>
+                  <div class="tl__name">Halcyon SA</div>
+                  <div class="tl__when">Overdue 6 days</div>
+                </div>
+                <div class="tl__amt num">€17,900</div>
+              </div>
+              <div class="tl">
+                <span class="tl__dot" style="background: var(--negative)"></span>
+                <div>
+                  <div class="tl__name">Verity Co</div>
+                  <div class="tl__when">Overdue 41 days</div>
+                </div>
+                <div class="tl__amt num">€5,220</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Chapter 03 -->
+        <section class="chapter">
+          <div class="chapter__copy">
+            <div class="chapter__index" data-reveal>
+              <span class="chapter__num">Signals</span>
+              <span class="chapter__rule"></span>
+            </div>
+            <h2 class="t-h2" data-reveal>Get told before it becomes a quarter.</h2>
+            <p class="t-body-lg chapter__body" data-reveal>
+              Margin erosion is slow and quiet. ProfitMe watches the shape of
+              your numbers and flags the drift while it is still a fixable
+              week, with the reason attached — not just an alert.
+            </p>
+            <ul class="chapter__list">
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Cause attached to every flag
+              </li>
+              <li data-reveal>
+                <span class="chapter__tick">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Thresholds you set, not defaults you inherit
+              </li>
+            </ul>
+          </div>
+
+          <div class="chapter__visual" data-reveal>
+            <p class="panel__eyebrow">Signals</p>
+            <p class="panel__title">This week</p>
+            <div class="anomaly">
+              <div class="anomaly__row anomaly__row--flag">
+                <div>
+                  <div class="anomaly__what">Legacy plan margin turned negative</div>
+                  <div class="anomaly__meta">412 accounts · −9% contribution</div>
+                </div>
+                <span class="pill pill--negative">Flagged</span>
+              </div>
+              <div class="anomaly__row">
+                <div>
+                  <div class="anomaly__what">Payment fees up 1.4 pts</div>
+                  <div class="anomaly__meta">Provider mix changed 12 Oct</div>
+                </div>
+                <span class="pill pill--caution">Review</span>
+              </div>
+              <div class="anomaly__row">
+                <div>
+                  <div class="anomaly__what">Atlas Pro margin holding</div>
+                  <div class="anomaly__meta">61% for 6 consecutive weeks</div>
+                </div>
+                <span class="pill pill--positive">Healthy</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- =================================================================
+           06 — TRUST
+           =================================================================== -->
+      <section class="section trust" id="trust">
+        <div class="container">
+          <h2 class="t-h1" data-reveal style="max-width: 22ch; margin-bottom: var(--space-3xl)">
+            Built for numbers you are accountable for.
+          </h2>
+
+          <div class="trust__grid">
+            <div class="trust__item" data-reveal>
+              <div class="trust__icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2.5 3.5 5.2v4.4c0 4 2.8 7 6.5 8 3.7-1 6.5-4 6.5-8V5.2L10 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3>Encrypted end to end</h3>
+              <p>
+                Data is encrypted in transit and at rest. Connections are
+                read-only by default — ProfitMe never needs write access to
+                your ledger.
+              </p>
+            </div>
+
+            <div class="trust__item" data-reveal>
+              <div class="trust__icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M4 16V8.5M10 16V4M16 16v-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3>Every figure traceable</h3>
+              <p>
+                Click any number to see the transactions behind it. No figure in
+                ProfitMe exists without a path back to its source rows.
+              </p>
+            </div>
+
+            <div class="trust__item" data-reveal>
+              <div class="trust__icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 6v4l2.6 1.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3>Yours to leave with</h3>
+              <p>
+                Full export in one click, in formats your accountant already
+                uses. No lock-in, no retention call required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           07 — CLOSE
+           =================================================================== -->
+      <section class="section close" id="close">
+        <div class="close__wash"></div>
+        <div class="container">
+          <h2 class="t-display close__title" data-reveal>
+            Find out what you actually made.
+          </h2>
+          <p class="t-body-lg close__sub" data-reveal>
+            Connect a source and ProfitMe returns your real contribution margin
+            in under two minutes. If the number is not useful, close the tab.
+          </p>
+          <div class="close__actions" data-reveal>
+            <a class="btn btn--primary" href="#top">
+              Start free
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a class="btn btn--glass" href="#product">Talk to us</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>© 2026 ProfitMe</span>
+        <nav class="footer__links" aria-label="Footer">
+          <a href="#top">Privacy</a>
+          <a href="#top">Terms</a>
+          <a href="#top">Security</a>
+          <a href="#top">Status</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="scripts/stage.js"></script>
+    <script src="scripts/physics.js"></script>
+  </body>
+</html>

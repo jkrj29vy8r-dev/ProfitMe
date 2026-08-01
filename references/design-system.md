@@ -138,7 +138,8 @@ matching the eyebrow pattern confirmed on both Rimac and the Verdikt dashboard.
 
 | Token         | Size / Line height | Tracking | Weight     | For                          |
 | ------------- | ------------------- | -------- | ---------- | ----------------------------- |
-| `text-display`| 56px / 60px         | −2%      | 600        | Hero numbers, landing headline |
+| `text-hero`   | `clamp(42px, 6.4vw, 96px)` / 0.94 | −3.5% | 600 | Landing hero headline only — the one place type is allowed to dominate the viewport. Ceiling set by the constraint that eyebrow through sub-CTA note must fit one viewport at 900px height; larger values pushed the CTAs below the fold. |
+| `text-display`| 56px / 60px         | −2%      | 600        | Hero numbers, in-product display figures |
 | `text-h1`     | 40px / 46px         | −1.5%    | 600        | Page titles                   |
 | `text-h2`     | 28px / 34px         | −1%      | 600        | Section headings              |
 | `text-h3`     | 20px / 28px         | −0.5%    | 600        | Card/module titles            |
