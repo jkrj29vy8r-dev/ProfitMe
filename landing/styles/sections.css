@@ -122,10 +122,9 @@
 .rail__fill {
   display: block;
   height: 100%;
-  width: var(--grown, 0%);
+  width: 0%;
   border-radius: inherit;
   background: var(--accent);
-  transition: width 900ms var(--ease-entry);
 }
 
 .rail__fill--muted {
@@ -158,9 +157,10 @@
   position: relative;
   border-radius: var(--radius-lg);
   border: 1px solid var(--glass-card-edge);
-  background: var(--glass-card-bg);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  /* Opaque by design. This is the biggest surface on the page and the pinned
+     timeline scales and rotates it on a scrub — sampling a backdrop through
+     that every frame is the single most expensive thing the page could do. */
+  background: var(--surface-float);
   box-shadow: var(--elevation-2);
   padding: var(--space-sm);
   overflow: hidden;
@@ -339,9 +339,8 @@
 .mrow__bar span {
   display: block;
   height: 100%;
-  width: var(--grown, 0%);
+  width: 0%;
   border-radius: inherit;
-  transition: width 800ms var(--ease-entry);
 }
 
 .mrow__bar span.is-pos {
@@ -373,29 +372,13 @@
   fill: url(#pmGrad);
 }
 
+/* Draw is scrubbed to scroll position by ScrollTrigger. */
 .chart__line {
   fill: none;
   stroke: var(--accent);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: var(--len, 1000);
-  stroke-dashoffset: var(--len, 1000);
-  animation: draw 1400ms var(--ease-entry) forwards;
-  animation-delay: 220ms;
-}
-
-@keyframes draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chart__line {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
 }
 
 .chart__dot {
@@ -523,8 +506,7 @@
 
 .waterfall__bar {
   border-radius: var(--radius-sm);
-  height: var(--grown, 0%);
-  transition: height 760ms var(--ease-entry);
+  height: 0%;
   background: var(--text-tertiary);
   opacity: 0.35;
 }
@@ -746,3 +728,13 @@
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
+
+/* ----------------------------------------------------------------------------
+   Pinned stage
+   The stage needs room to be held against while its timeline plays out.
+   -------------------------------------------------------------------------- */
+
+[data-pin-frame] {
+  transform-style: preserve-3d;
+}
+

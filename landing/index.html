@@ -36,12 +36,10 @@
     <link rel="stylesheet" href="styles/sections.css" />
     <noscript>
       <style>
-        /* Reveals are JS-driven. With scripting off, show everything at rest
-           rather than leaving the page blank, and drop the ambient motion. */
-        [data-reveal] {
-          opacity: 1 !important;
-          transform: none !important;
-        }
+        /* Resting states are applied by GSAP, so nothing is hidden by CSS.
+           Without scripting the page renders complete and static — only the
+           ambient motion and the scrubbed values need pinning to their end
+           state. */
         .float {
           animation: none !important;
           opacity: var(--rest-opacity, 1) !important;
@@ -51,9 +49,11 @@
           stroke-dashoffset: 0 !important;
         }
         .rail__fill,
-        .mrow__bar span,
+        .mrow__bar span {
+          width: 100%;
+        }
         .waterfall__bar {
-          --grown: 100%;
+          height: 100%;
         }
       </style>
     </noscript>
@@ -151,30 +151,22 @@
 
         <div class="container hero__inner">
           <div class="hero__copy">
-            <p class="t-label hero__eyebrow" data-reveal data-reveal-delay="0">
+            <p class="t-label hero__eyebrow" data-hero-in>
               <span class="hero__eyebrow-dot"></span>
               Profit intelligence
             </p>
 
-            <h1
-              class="t-hero hero__title"
-              data-reveal
-              data-reveal-delay="80"
-            >
+            <h1 class="t-hero hero__title" data-split>
               See the profit<br />behind the <em>revenue</em>.
             </h1>
 
-            <p
-              class="t-body-lg hero__sub"
-              data-reveal
-              data-reveal-delay="160"
-            >
+            <p class="t-body-lg hero__sub" data-hero-in>
               Revenue tells you the month was busy. ProfitMe tells you which
               products, customers and invoices actually paid for it — down to
               the line.
             </p>
 
-            <div class="hero__actions" data-reveal data-reveal-delay="220">
+            <div class="hero__actions" data-hero-in>
               <a class="btn btn--primary" href="#close">
                 Start free
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -190,7 +182,7 @@
               <a class="btn btn--glass" href="#product">See it working</a>
             </div>
 
-            <p class="t-caption hero__note" data-reveal data-reveal-delay="280">
+            <p class="t-caption hero__note" data-hero-in>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path
                   d="M3 8.5l3.2 3L13 5"
@@ -335,26 +327,26 @@
            02 — PROOF STRIP
            =================================================================== -->
       <section class="proof" aria-label="Key numbers">
-        <div class="container proof__grid">
-          <div data-reveal>
+        <div class="container proof__grid" data-reveal-group>
+          <div data-reveal-item>
             <div class="proof__value num">
               <span data-count="2.4" data-decimals="1" data-prefix="€" data-suffix="B">€0.0B</span>
             </div>
             <p class="proof__label">Revenue analysed</p>
           </div>
-          <div data-reveal>
+          <div data-reveal-item>
             <div class="proof__value num">
               <span data-count="11" data-suffix=" pts">0 pts</span>
             </div>
             <p class="proof__label">Median margin found</p>
           </div>
-          <div data-reveal>
+          <div data-reveal-item>
             <div class="proof__value num">
               <span data-count="94" data-suffix="s">0s</span>
             </div>
             <p class="proof__label">Average setup time</p>
           </div>
-          <div data-reveal>
+          <div data-reveal-item>
             <div class="proof__value num">
               <span data-count="1200" data-suffix="+">0+</span>
             </div>
@@ -366,19 +358,19 @@
       <!-- =================================================================
            03 — THE ARGUMENT
            =================================================================== -->
-      <section class="section" id="argument">
+      <section class="section" id="argument" data-recede>
         <div class="container">
           <div class="argument__head">
-            <h2 class="t-h1" data-reveal>Revenue is a headline. Profit is the story.</h2>
-            <p class="t-body-lg argument__lede" data-reveal>
+            <h2 class="t-h1" data-split>Revenue is a headline. Profit is the story.</h2>
+            <p class="t-body-lg argument__lede" data-reveal-group><span data-reveal-item>
               Most tools stop at what came in. The gap between those two numbers
               is where a business is actually won or lost — and it is almost
               never where you expect.
             </p>
           </div>
 
-          <div class="compare">
-            <div class="compare__card" data-reveal>
+          <div class="compare" data-cards data-grow-scope>
+            <div class="compare__card" data-card>
               <p class="t-label">Reported revenue</p>
               <p class="compare__value num">
                 <span data-count="1840000" data-prefix="€">€0</span>
@@ -394,7 +386,7 @@
               </p>
             </div>
 
-            <div class="compare__card compare__card--accent" data-reveal>
+            <div class="compare__card compare__card--accent" data-card>
               <p class="t-label">Actual contribution</p>
               <p class="compare__value num">
                 <span data-count="312000" data-prefix="€">€0</span>
@@ -403,7 +395,7 @@
                 <span class="pill pill--caution">Down 4% YoY</span>
               </div>
               <div class="rail">
-                <span class="rail__fill" data-grow="17%" data-grow-delay="220"></span>
+                <span class="rail__fill" data-grow="17%"></span>
               </div>
               <p class="compare__note">
                 The number that decides whether next year happens. ProfitMe
@@ -417,17 +409,17 @@
       <!-- =================================================================
            04 — PRODUCT REVEAL
            =================================================================== -->
-      <section class="reveal-stage" id="product">
+      <section class="reveal-stage" id="product" data-pin-stage>
         <div class="container">
-          <div class="reveal-stage__head">
-            <h2 class="t-h1" data-reveal>Everything in one view.</h2>
-            <p class="t-body-lg reveal-stage__sub" data-reveal>
+          <div class="reveal-stage__head" data-pin-head>
+            <h2 class="t-h1" data-split>Everything in one view.</h2>
+            <p class="t-body-lg reveal-stage__sub">
               One screen that answers the only question that matters this
               morning: what is actually making money right now.
             </p>
           </div>
 
-          <div class="frame" data-reveal>
+          <div class="frame" data-pin-frame data-grow-scope data-draw-scope>
             <div class="frame__bar" aria-hidden="true">
               <span class="frame__dot"></span>
               <span class="frame__dot"></span>
@@ -495,10 +487,10 @@
                     />
                     <path
                       class="chart__line"
-                      style="--len: 460"
+                      data-draw
                       d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28"
                     />
-                    <circle class="chart__dot" cx="418" cy="28" r="4" />
+                    <circle class="chart__dot" cx="418" cy="28" r="4" data-draw-dot />
                   </svg>
                 </div>
 
@@ -528,7 +520,7 @@
                     </div>
                     <div class="mrow__val num">38%</div>
                     <div class="mrow__bar">
-                      <span class="is-pos" data-grow="38%" data-grow-delay="80"></span>
+                      <span class="is-pos" data-grow="38%"></span>
                     </div>
                   </div>
 
@@ -539,7 +531,7 @@
                     </div>
                     <div class="mrow__val num">12%</div>
                     <div class="mrow__bar">
-                      <span class="is-cau" data-grow="12%" data-grow-delay="160"></span>
+                      <span class="is-cau" data-grow="12%"></span>
                     </div>
                   </div>
 
@@ -550,7 +542,7 @@
                     </div>
                     <div class="mrow__val num">−9%</div>
                     <div class="mrow__bar">
-                      <span class="is-neg" data-grow="9%" data-grow-delay="240"></span>
+                      <span class="is-neg" data-grow="9%"></span>
                     </div>
                   </div>
                 </div>
@@ -565,33 +557,33 @@
            =================================================================== -->
       <div class="container" id="chapters">
         <!-- Chapter 01 -->
-        <section class="chapter">
+        <section class="chapter" data-grow-scope>
           <div class="chapter__copy">
-            <div class="chapter__index" data-reveal>
+            <div class="chapter__index">
               <span class="chapter__num">Margin</span>
               <span class="chapter__rule"></span>
             </div>
-            <h2 class="t-h2" data-reveal>Find the margin you are losing.</h2>
-            <p class="t-body-lg chapter__body" data-reveal>
+            <h2 class="t-h2" data-split>Find the margin you are losing.</h2>
+            <p class="t-body-lg chapter__body">
               ProfitMe allocates every cost — COGS, fees, refunds, support time
               — back to the product and customer that caused it. The result is
               a contribution figure per line, not a company-wide average that
               hides the problem.
             </p>
-            <ul class="chapter__list">
-              <li data-reveal>
+            <ul class="chapter__list" data-reveal-group>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
                 Per-product and per-customer contribution
               </li>
-              <li data-reveal>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
                 Refunds and fees netted automatically
               </li>
-              <li data-reveal>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
@@ -600,28 +592,28 @@
             </ul>
           </div>
 
-          <div class="chapter__visual" data-reveal>
+          <div class="chapter__visual" data-card-solo>
             <p class="panel__eyebrow">Revenue → contribution</p>
             <p class="panel__title">Where €184,200 goes</p>
             <div class="waterfall">
               <div class="waterfall__col">
-                <span class="waterfall__bar waterfall__bar--accent" data-grow="100%"></span>
+                <span class="waterfall__bar waterfall__bar--accent" data-grow-h="100%"></span>
                 <span class="waterfall__label">Revenue</span>
               </div>
               <div class="waterfall__col">
-                <span class="waterfall__bar waterfall__bar--neg" data-grow="52%" data-grow-delay="90"></span>
+                <span class="waterfall__bar waterfall__bar--neg" data-grow-h="52%"></span>
                 <span class="waterfall__label">COGS</span>
               </div>
               <div class="waterfall__col">
-                <span class="waterfall__bar waterfall__bar--neg" data-grow="17%" data-grow-delay="180"></span>
+                <span class="waterfall__bar waterfall__bar--neg" data-grow-h="17%"></span>
                 <span class="waterfall__label">Fees</span>
               </div>
               <div class="waterfall__col">
-                <span class="waterfall__bar waterfall__bar--neg" data-grow="14%" data-grow-delay="270"></span>
+                <span class="waterfall__bar waterfall__bar--neg" data-grow-h="14%"></span>
                 <span class="waterfall__label">Support</span>
               </div>
               <div class="waterfall__col">
-                <span class="waterfall__bar waterfall__bar--accent" data-grow="17%" data-grow-delay="360"></span>
+                <span class="waterfall__bar waterfall__bar--accent" data-grow-h="17%"></span>
                 <span class="waterfall__label">Left</span>
               </div>
             </div>
@@ -629,26 +621,26 @@
         </section>
 
         <!-- Chapter 02 -->
-        <section class="chapter chapter--flip">
+        <section class="chapter chapter--flip" data-grow-scope>
           <div class="chapter__copy">
-            <div class="chapter__index" data-reveal>
+            <div class="chapter__index">
               <span class="chapter__num">Cash</span>
               <span class="chapter__rule"></span>
             </div>
-            <h2 class="t-h2" data-reveal>Know when the money actually lands.</h2>
-            <p class="t-body-lg chapter__body" data-reveal>
+            <h2 class="t-h2" data-split>Know when the money actually lands.</h2>
+            <p class="t-body-lg chapter__body">
               A profitable month you cannot fund is still a problem. ProfitMe
               maps every invoice to its expected settlement date, so the cash
               gap is a number you plan around rather than discover.
             </p>
-            <ul class="chapter__list">
-              <li data-reveal>
+            <ul class="chapter__list" data-reveal-group>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
                 Expected settlement per invoice
               </li>
-              <li data-reveal>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
@@ -657,7 +649,7 @@
             </ul>
           </div>
 
-          <div class="chapter__visual" data-reveal>
+          <div class="chapter__visual" data-card-solo>
             <p class="panel__eyebrow">Cash timeline</p>
             <p class="panel__title">Next 30 days</p>
             <div class="timeline">
@@ -698,26 +690,26 @@
         </section>
 
         <!-- Chapter 03 -->
-        <section class="chapter">
+        <section class="chapter" data-grow-scope>
           <div class="chapter__copy">
-            <div class="chapter__index" data-reveal>
+            <div class="chapter__index">
               <span class="chapter__num">Signals</span>
               <span class="chapter__rule"></span>
             </div>
-            <h2 class="t-h2" data-reveal>Get told before it becomes a quarter.</h2>
-            <p class="t-body-lg chapter__body" data-reveal>
+            <h2 class="t-h2" data-split>Get told before it becomes a quarter.</h2>
+            <p class="t-body-lg chapter__body">
               Margin erosion is slow and quiet. ProfitMe watches the shape of
               your numbers and flags the drift while it is still a fixable
               week, with the reason attached — not just an alert.
             </p>
-            <ul class="chapter__list">
-              <li data-reveal>
+            <ul class="chapter__list" data-reveal-group>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
                 Cause attached to every flag
               </li>
-              <li data-reveal>
+              <li data-reveal-item>
                 <span class="chapter__tick">
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
@@ -726,7 +718,7 @@
             </ul>
           </div>
 
-          <div class="chapter__visual" data-reveal>
+          <div class="chapter__visual" data-card-solo>
             <p class="panel__eyebrow">Signals</p>
             <p class="panel__title">This week</p>
             <div class="anomaly">
@@ -759,14 +751,14 @@
       <!-- =================================================================
            06 — TRUST
            =================================================================== -->
-      <section class="section trust" id="trust">
+      <section class="section trust" id="trust" data-recede>
         <div class="container">
-          <h2 class="t-h1" data-reveal style="max-width: 22ch; margin-bottom: var(--space-3xl)">
+          <h2 class="t-h1" data-split style="max-width: 22ch; margin-bottom: var(--space-3xl)">
             Built for numbers you are accountable for.
           </h2>
 
-          <div class="trust__grid">
-            <div class="trust__item" data-reveal>
+          <div class="trust__grid" data-cards>
+            <div class="trust__item" data-card>
               <div class="trust__icon">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M10 2.5 3.5 5.2v4.4c0 4 2.8 7 6.5 8 3.7-1 6.5-4 6.5-8V5.2L10 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -780,7 +772,7 @@
               </p>
             </div>
 
-            <div class="trust__item" data-reveal>
+            <div class="trust__item" data-card>
               <div class="trust__icon">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M4 16V8.5M10 16V4M16 16v-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
@@ -793,7 +785,7 @@
               </p>
             </div>
 
-            <div class="trust__item" data-reveal>
+            <div class="trust__item" data-card>
               <div class="trust__icon">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
@@ -816,14 +808,14 @@
       <section class="section close" id="close">
         <div class="close__wash"></div>
         <div class="container">
-          <h2 class="t-display close__title" data-reveal>
+          <h2 class="t-display close__title" data-split>
             Find out what you actually made.
           </h2>
-          <p class="t-body-lg close__sub" data-reveal>
+          <p class="t-body-lg close__sub" data-reveal-group><span data-reveal-item>
             Connect a source and ProfitMe returns your real contribution margin
             in under two minutes. If the number is not useful, close the tab.
-          </p>
-          <div class="close__actions" data-reveal>
+          </span></p>
+          <div class="close__actions" data-reveal-group><span data-reveal-item style="display:contents">
             <a class="btn btn--primary" href="#top">
               Start free
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -831,7 +823,7 @@
               </svg>
             </a>
             <a class="btn btn--glass" href="#product">Talk to us</a>
-          </div>
+          </span></div>
         </div>
       </section>
     </main>
@@ -848,7 +840,11 @@
       </div>
     </footer>
 
+    <script src="vendor/lenis.min.js"></script>
+    <script src="vendor/gsap.min.js"></script>
+    <script src="vendor/ScrollTrigger.min.js"></script>
     <script src="scripts/stage.js"></script>
+    <script src="scripts/scroll.js"></script>
     <script src="scripts/physics.js"></script>
   </body>
 </html>

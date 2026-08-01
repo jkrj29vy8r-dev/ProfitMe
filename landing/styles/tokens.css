@@ -157,6 +157,9 @@
   --glass-overlay-edge: hsl(0 0% 100% / 0.08);
   --glass-card-bg: hsl(30 7% 12% / 0.55);
   --glass-card-edge: hsl(0 0% 100% / 0.09);
+  /* For surfaces that read as glass but move — opaque, so they never sample
+     a backdrop while animating. See scroll.js performance contract. */
+  --surface-float: hsl(30 7% 13%);
 
   /* Gallery light: the one gradient in the system. A single warm radial that
      reads as a light source on metal, not a marketing mesh. */
@@ -210,6 +213,7 @@
   --glass-overlay-edge: hsl(0 0% 0% / 0.06);
   --glass-card-bg: hsl(0 0% 100% / 0.62);
   --glass-card-edge: hsl(0 0% 0% / 0.07);
+  --surface-float: hsl(0 0% 100%);
 
   --hero-wash: radial-gradient(
     120% 80% at 50% -10%,
@@ -251,6 +255,7 @@
     --glass-nav-edge: hsl(0 0% 0% / 0.06);
     --glass-card-bg: hsl(0 0% 100% / 0.62);
     --glass-card-edge: hsl(0 0% 0% / 0.07);
+    --surface-float: hsl(0 0% 100%);
     --hero-wash: radial-gradient(120% 80% at 50% -10%, hsl(28 58% 45% / 0.1) 0%, hsl(28 58% 45% / 0.035) 34%, transparent 68%);
     --grid-line: hsl(30 15% 12% / 0.035);
   }

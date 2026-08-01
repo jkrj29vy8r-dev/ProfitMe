@@ -45,6 +45,7 @@ def main() -> None:
 
     kb = len(html.encode("utf-8")) / 1024
     print(f"built {out} ({kb:.1f} KB, no external requests)")
+    assert 'src="' not in html and 'href="styles' not in html, "external refs remain"
 
 
 if __name__ == "__main__":
