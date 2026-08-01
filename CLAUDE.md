@@ -95,21 +95,70 @@ The references exist to raise the ceiling, not to supply the answer.
 
 ### Quality bar
 
-World-class premium SaaS. Concretely, that means:
+**Never ship generic SaaS UI.** Every page must stand next to Apple, Linear,
+Stripe and Porsche without embarrassment.
 
-- A real design system — tokens for color, type, space, radius, shadow and
-  motion — not one-off values scattered across components.
-- Every state designed: default, hover, focus, active, disabled, loading, empty,
-  error, and the "not enough data yet" case that analytics products always miss.
-- Motion that is fast, purposeful, interruptible, and honors
-  `prefers-reduced-motion`.
-- Accessible by construction: WCAG AA contrast minimum, visible focus rings,
-  keyboard-navigable, semantic HTML, meaningful labels. Never encode meaning in
-  color alone — profit and loss need more than green and red.
-- Responsive by design rather than by breakpoint patching. Dense tables and
-  charts must have a considered narrow-screen story.
-- Performance is part of the design: animate transform and opacity, avoid layout
-  thrash, no jank on scroll-linked motion.
+That means their *level* — the quality, the motion, the attention to detail —
+not their appearance. This does not soften the originality rules above; it is
+the standard those rules are held to. Matching their craft while looking like
+none of them is the entire job.
+
+#### What "generic" means concretely
+
+These are the defaults that produce forgettable SaaS. Each is a defect:
+
+- Untouched component-library styling shipped as-is (default shadcn/MUI/Bootstrap
+  look), or a stock template layout.
+- The default purple-blue gradient hero. Rounded-corner card grid with three
+  equal feature boxes. Centered hero, subhead, two buttons, logo strip.
+- Type that is all one weight at three sizes, with default line heights and no
+  tracking decisions.
+- Spacing chosen ad hoc — everything at 16px because it was the first value that
+  looked fine.
+- Motion added at the end as decoration: fade-in-on-scroll applied uniformly to
+  every section.
+- Generic stock iconography and undifferentiated empty states ("No data").
+
+#### The non-negotiables
+
+**Motion.** Smooth, fast, purposeful. Transform and opacity only. Interruptible —
+reversing mid-animation must never snap. Choreographed, not uniform: related
+elements stagger, entering and exiting use different curves, and every animation
+justifies its existence by clarifying a state change or preserving spatial
+continuity. Honors `prefers-reduced-motion`. 60fps is the floor, including on
+scroll-linked motion.
+
+**Spacing.** Premium means generous and *rhythmic*, not merely large. Space
+derives from one scale; sections breathe; density is a deliberate choice per
+surface. Optical alignment beats mathematical alignment when they disagree.
+
+**Typography.** The highest-leverage surface in the product. Deliberate scale,
+real weight contrast, tracking tightened as size increases, line height tuned per
+role, measure capped for readability. Tabular figures everywhere numbers are
+compared.
+
+**Glass — subtle, and disciplined.** `backdrop-filter` is expensive and easy to
+overdo. Rules: use it for surfaces that float above content (nav, overlays,
+command palette, sticky headers), not for everything; keep blur restrained;
+always pair with a border or subtle inner highlight so the edge reads; and
+**verify text contrast over the worst-case backdrop**, not the demo screenshot.
+Never blur a large surface that animates or scroll-links. Provide a solid
+fallback where support or performance requires it. If glass isn't earning its
+cost on a given surface, don't use it there.
+
+**Performance is design.** Animate transform and opacity, avoid layout thrash,
+respect the compositor, keep blurred layers few, watch bundle and font loading.
+A beautiful page that stutters has failed the bar — smoothness *is* the premium
+feel, and dropping frames reads as cheap no matter how good the static
+composition is.
+
+**Craft baseline.** A real token system, not one-off values. Every state
+designed: default, hover, focus, active, disabled, loading, empty, error, and
+the "not enough data yet" case analytics products always miss. Accessible by
+construction — WCAG AA minimum, visible focus rings, keyboard-navigable,
+semantic HTML; never encode meaning in color alone, since profit and loss need
+more than green and red. Responsive by design, with a considered narrow-screen
+story for dense tables and charts.
 
 ### Output
 
@@ -117,3 +166,6 @@ When presenting a design, lead with the reasoning: what the references
 established, what direction was chosen for ProfitMe, and why. Then the work.
 Flag any spot where a reference tempted a direction that was deliberately
 rejected as too derivative.
+
+Before presenting, run the work against the *generic* list above. If any item
+matches, it gets fixed first — not shipped with a note acknowledging it.

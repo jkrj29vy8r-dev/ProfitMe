@@ -48,6 +48,14 @@ Radius scale and which size belongs to which surface class. Border weight and
 color. Shadow ramp tied to elevation level. Consistency here does more for
 "premium" than any single flourish.
 
+## Materials & glass — TBD
+
+Which surface classes are glass and which are solid, blur radius and background
+tint per class, the border or inner-highlight treatment that makes the edge
+read, and the solid fallback. Glass is for surfaces floating above content only.
+Record the worst-case backdrop each glass surface must stay legible over —
+contrast gets verified against that, not against a favorable screenshot.
+
 ## Motion — TBD
 
 Duration scale (fast / base / slow) and what each is for. Easing curves by
