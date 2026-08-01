@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+references/**/*.png  binary
+references/**/*.jpg  binary
+references/**/*.jpeg binary
+references/**/*.webp binary
+references/**/*.gif  binary
+references/**/*.mp4  binary
+references/**/*.mov  binary
+references/**/*.webm binary
