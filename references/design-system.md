@@ -7,7 +7,21 @@ is the contract.** Every UI component builds from these tokens.
 > measured evidence where the references support it, from explicit domain
 > reasoning where they don't. See [`observations.md`](observations.md) for the
 > evidence trail. This is a system to build components from, not a mockup; it
-> gets revised as real components expose gaps, per the maintenance rules above.
+> gets revised as real components expose gaps, per the maintenance rules below.
+
+## How this file is maintained
+
+- A component needs a value that is not here → derive it from the references,
+  add it here as a named token, *then* write the component. Never a local
+  one-off.
+- A design pass learns something new → fold it back into this file in the same
+  session, so the next component starts from it.
+- A token changes → it changes here first, and existing components are updated
+  to match. Two competing values for the same idea is a bug.
+- Every token needs a **name and a job**, not just a value. "What is this for"
+  is what keeps a system coherent as it grows.
+
+---
 
 ## Brand direction
 
@@ -241,73 +255,6 @@ token ships on a real surface.
 
 ## Motion — derived (2026-08-01)
 
-## How this file is maintained
-
-- A component needs a value that is not here → derive it from the references,
-  add it here as a named token, *then* write the component. Never a local
-  one-off.
-- A design pass learns something new → fold it back into this file in the same
-  session, so the next component starts from it.
-- A token changes → it changes here first, and existing components are updated
-  to match. Two competing values for the same idea is a bug.
-- Every token needs a **name and a job**, not just a value. "What is this for"
-  is what keeps a system coherent as it grows.
-
----
-
-## Color — TBD
-
-Neutral ramp, surface levels, border colors, one accent and what it is reserved
-for, and semantic colors.
-
-**Domain constraint:** ProfitMe reports profit and loss. Positive/negative must
-never be encoded in color alone — pair with sign, icon, or label. Contrast is
-WCAG AA minimum, verified against real surfaces rather than assumed.
-
-## Typography — TBD
-
-Typeface, type scale and its steps, weights in use, tracking per size, line
-heights, measure limits. Prefer few steps used consistently over many used
-loosely. Tabular figures for all numeric/financial data.
-
-## Spacing — TBD
-
-Base unit and scale. Component-internal padding, gaps between related elements,
-section rhythm. Every gap in the product resolves to a step on this scale.
-
-## Radius, borders & elevation — TBD
-
-Radius scale and which size belongs to which surface class. Border weight and
-color. Shadow ramp tied to elevation level. Consistency here does more for
-"premium" than any single flourish.
-
-## Materials & glass — partially derived (2026-08-01)
-
-Which surface classes are glass, and the blur/tint values per class, remain TBD.
-The **recipe** is decided, derived from `audi/` — the one production reference
-where translucent controls sit on photography and stay legible across a bright
-sky and a near-black car body in the same scroll.
-
-1. **Restraint over drama.** Enough backdrop shows through to read as material;
-   not enough to let the backdrop's contrast swing through it. If the content
-   behind is clearly identifiable through the surface, there is too much
-   transparency.
-2. **Always a visible edge.** A border or inner highlight, so the control's
-   boundary never depends on the backdrop. This is what actually makes glass read
-   as an object rather than a smudge.
-3. **Flat label value.** Text on glass stays one fixed color and never picks up
-   tint from behind it.
-4. **Hierarchy by fill weight, not hue.** Primary and secondary differ in
-   opacity/fill, so the pair behaves identically on any backdrop.
-5. **Worst-case verification is mandatory.** Every glass surface records the
-   lightest and darkest backdrop it must survive, and contrast is checked against
-   both — never against a favorable screenshot.
-6. Floating surfaces only — nav, overlays, command palette, sticky headers. Never
-   on a large surface that animates or scroll-links. Solid fallback always
-   available.
-
-## Motion — derived (2026-08-01)
-
 Measured from 60fps captures of apple.com and rimac-automobili.com, which
 converge on the same reveal pattern independently. Evidence in
 [`observations.md`](observations.md).
@@ -359,6 +306,62 @@ ease-in-out, and nothing springs or bounces.
    principle 2 applied to data instead of menu items — the cascade generalizes.
    It runs once on mount, never on every re-render, and never on a value update
    (a changing number tweens, it does not re-grow from zero).
+
+### 3D scenes (WebGL) — derived 2026-08-01
+
+First real 3D work in the product: a Three.js hero scene. Vanilla Three.js, not
+React Three Fiber — this codebase has no React, and R3F is a reconciler for
+React, not an independent capability; bootstrapping React + ReactDOM + the R3F
+runtime to mount one scene would cost roughly 3x the dependency Three.js alone
+already costs, for nothing Three.js couldn't already do directly. If the product
+becomes a React app, this scene graph ports to R3F components near 1:1.
+
+- **Position in screen-fraction space, not raw world coordinates.** A fixed
+  world-space X lands at a different screen position depending on how far the
+  object sits from the camera — perspective shrinks apparent lateral offset
+  with distance. Define objects as `(xFrac, yFrac, z)`, `-1..1` across the
+  visible frustum *at that object's depth*, and convert through the camera's
+  actual FOV/aspect at render time. Recompute on resize; aspect changes what a
+  given fraction maps to. This is the 2D hero's "keep it in the margins, out of
+  the text column" CSS-percentage discipline, ported to 3D — skipping it is
+  exactly how objects end up drifting across headline text.
+- **Canvas-texture over 3D text geometry.** A "screen" inside the scene (coin
+  face, invoice, KPI card) is a 2D canvas drawn once and mapped as a texture,
+  not extruded glyph geometry. No font loading, no per-glyph triangle cost, and
+  it reuses the same visual vocabulary already established in CSS-authored
+  components — just lit and rotating in real 3D now.
+- **The render loop must fully stop, not throttle, when unseen.** Gate on
+  IntersectionObserver *and* on the element's own computed opacity/fade — an
+  observer alone typically only fires "not intersecting" once the element is
+  almost entirely scrolled past, well after a scroll-tied fade has already
+  reached zero. That gap is measured cost: a WebGL frame keeps rendering,
+  invisibly, overlapping whatever reveal-heavy content sits just below it.
+  Also stop on `document.hidden` (tab backgrounded) — an idle canvas still
+  costs a scheduled frame if the loop keeps calling itself.
+  - No shadow maps, no post-processing, no env-map PBR.
+  - Merge repeating geometry (e.g. chart bars) into one `BufferGeometry` — one
+    draw call instead of N.
+  - One draw call for any particle field regardless of count (`THREE.Points`).
+  - Disable antialiasing and cap pixel ratio below what a display supports.
+    MSAA is near-free on real GPU hardware but not on integrated/software
+    rendering, and retina sharpness is not what makes ambient decoration read
+    as premium — holding frame rate is.
+  - Below the width where the 2D hero already drops decorative depth, skip
+    initializing the scene at all — a 3D scene is the most GPU/battery-costly
+    thing on the page and has no place on a phone showing a single-column hero.
+  - Detect WebGL availability and fall back to the plain CSS surface
+    underneath rather than erroring — a decorative layer must never be able to
+    break the page it decorates.
+- **Theme reactivity without rebuilding the scene.** Watch `data-theme` via
+  `MutationObserver` and refresh only the colors already read from CSS custom
+  properties on the existing materials/uniforms. Geometry, positions and the
+  running clock stay untouched — cheaper and avoids a visible pop on toggle.
+- **Honest performance reporting.** Compositor-only CSS/transform work costs
+  roughly the same regardless of GPU, so it can be measured here and trusted.
+  WebGL cannot: this environment has no real GPU, so any frame-rate number
+  measured here reflects software rasterization, not user hardware, and is
+  pessimistic by construction. Design conservatively for that reason — don't
+  report a software-rendered number as if it were the real-hardware one.
 
 ## Component conventions — derived (2026-08-01)
 

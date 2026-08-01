@@ -158,8 +158,13 @@
            01 — HERO
            =================================================================== -->
       <section class="hero" id="top">
-        <div class="hero__wash"></div>
-        <div class="hero__grid"></div>
+
+        <!-- 3D hero scene mounts here — a direct child of .hero, which is
+             the positioned ancestor inset:0 resolves against. Nesting this
+             inside .hero__inner instead (which is also position:relative,
+             for its own z-index stacking) would size the canvas to the text
+             block's height rather than the full hero. -->
+        <div class="hero-scene" data-hero-scene aria-hidden="true"></div>
 
         <div class="container hero__inner">
           <div class="hero__copy">
@@ -206,127 +211,6 @@
               </svg>
               No card required · Connects in under two minutes
             </p>
-          </div>
-
-          <!-- The floating field ------------------------------------------->
-          <div class="field" data-field aria-hidden="true">
-            <!-- Currency marks: machined plaques, depth-layered -->
-            <div
-              class="float float--near"
-              data-float
-              data-depth="near"
-              style="--x: 6%; --y: 15%; --in-delay: 320ms"
-            >
-              <div class="coin coin--lg">€</div>
-            </div>
-
-            <div
-              class="float float--mid"
-              data-float
-              data-depth="mid"
-              style="--x: 90%; --y: 13%; --in-delay: 420ms"
-            >
-              <div class="coin coin--md">$</div>
-            </div>
-
-            <div
-              class="float float--far"
-              data-float
-              data-depth="far"
-              style="--x: 23%; --y: 84%; --in-delay: 560ms"
-            >
-              <div class="coin coin--sm">₿</div>
-            </div>
-
-            <!-- Financial chart -->
-            <div
-              class="float float--near"
-              data-float
-              data-depth="near"
-              style="--x: 74%; --y: 39%; --in-delay: 380ms"
-            >
-              <div class="chip">
-                <div class="chip__row">
-                  <div>
-                    <div class="chip__label">Gross margin</div>
-                    <div class="chip__value num">42.8%</div>
-                  </div>
-                  <div class="chip__delta chip__delta--up num">▲ 3.1</div>
-                </div>
-                <svg class="chip__spark" viewBox="0 0 110 26" preserveAspectRatio="none">
-                  <path d="M1 21 L14 18 L27 20 L40 13 L53 15 L66 9 L79 11 L92 5 L108 3" />
-                </svg>
-              </div>
-            </div>
-
-            <!-- Invoice -->
-            <div
-              class="float float--mid"
-              data-float
-              data-depth="mid"
-              style="--x: 3%; --y: 45%; --in-delay: 480ms"
-            >
-              <div class="doc">
-                <div class="doc__head">
-                  <span class="doc__tag">Invoice</span>
-                  <span class="doc__stamp">
-                    <svg width="8" height="8" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M3 8.5l3.2 3L13 5"
-                        stroke="currentColor"
-                        stroke-width="2.4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div class="doc__line" style="width: 82%"></div>
-                <div class="doc__line" style="width: 64%"></div>
-                <div class="doc__line" style="width: 72%"></div>
-                <div class="doc__total">
-                  <span>Paid</span>
-                  <span class="num">€ 14,280</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Document -->
-            <div
-              class="float float--far"
-              data-float
-              data-depth="far"
-              style="--x: 85%; --y: 71%; --in-delay: 620ms"
-            >
-              <div class="doc">
-                <div class="doc__head">
-                  <span class="doc__tag">Q3 Close</span>
-                </div>
-                <div class="doc__line" style="width: 90%"></div>
-                <div class="doc__line" style="width: 55%"></div>
-                <div class="doc__line" style="width: 78%"></div>
-                <div class="doc__line" style="width: 40%"></div>
-              </div>
-            </div>
-
-            <!-- Bar chart -->
-            <div
-              class="float float--mid"
-              data-float
-              data-depth="mid"
-              style="--x: 6%; --y: 72%; --in-delay: 520ms"
-            >
-              <div class="chip" style="min-width: 116px">
-                <div class="chip__label">By product</div>
-                <div class="bars">
-                  <span style="height: 42%"></span>
-                  <span style="height: 66%"></span>
-                  <span style="height: 38%"></span>
-                  <span style="height: 84%"></span>
-                  <span style="height: 100%"></span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -858,6 +742,6 @@
     <script src="scripts/stage.js"></script>
     <script src="scripts/scroll.js"></script>
     <script src="scripts/progress.js"></script>
-    <script src="scripts/physics.js"></script>
+    <script src="scripts/hero-scene.js"></script>
   </body>
 </html>
