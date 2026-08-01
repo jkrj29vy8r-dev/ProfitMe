@@ -23,6 +23,7 @@ extract *principles* and re-synthesize them into something unmistakably ProfitMe
 | `mercedes/`    | Serif-over-sans hierarchy, calm density, quiet controls                 |
 | `rimac/`       | Dark craft, section transitions, staggered reveals — best motion source |
 | `spline/`      | Dark SaaS marketing, elevated panels, interactive hero                  |
+| `audi/`        | Translucent controls on photography, full-screen chapters               |
 | `tesla/`       | Configurators, minimal chrome, full-bleed imagery                       |
 | `porsche/`     | Luxury detail, material feel, precision layout                          |
 | `stripe/`      | Developer-grade UI, docs, gradients, information density done well      |

@@ -173,3 +173,74 @@ sections instead of sitting inside one.
 The blue-accent-on-neutral observation from the first pass now holds across seven
 of nine sources, Verdikt included. Continuing to treat it as a structural
 principle to keep and a specific color to avoid.
+
+---
+
+## 2026-08-01 — third pass (5 new assets)
+
+One shipped site and four concept shots.
+
+### Audi — translucent controls over photography
+
+`audi.ro`, dark automotive marketing, structured as full-screen chapters: image,
+heading, two stacked pill CTAs, repeat. A footer carousel of models with explicit
+prev/next chevrons, an icon-plus-label quick-link row, and a persistent
+back-to-top control.
+
+**The reason this asset matters is glass.** It is the library's clearest
+production example of frosted, translucent buttons sitting directly on
+photography, and it survives the case `CLAUDE.md` demands be verified — the same
+button treatment stays legible over a bright sky and over a near-black car body
+within one scroll. How it manages that:
+
+- The translucency is **restrained**. Enough backdrop shows through to read as
+  material; not enough to let the backdrop's contrast swing through it.
+- Every pill carries a **visible edge**, so the control's boundary never depends
+  on the backdrop behind it.
+- The label stays a **single flat value** rather than picking up any tint from
+  what is behind it.
+- Primary and secondary differ by **fill weight**, not by hue — so the pair works
+  identically on any backdrop.
+
+That is the transferable recipe for the glass rules already in the design system,
+and it is now recorded there.
+
+Also worth keeping: the two-CTA rhythm closing every chapter, which gives a long
+scroll a predictable beat without repeating a layout.
+
+### Logistics dashboard concept — the light-mode counterweight
+
+The most transferable concept work received so far, and the library's only
+light-mode data-dense layout. Against the dark Verdikt dashboard it isolates which
+patterns are genuinely structural rather than theme-dependent:
+
+- **The eyebrow-over-title and module-card patterns survive the theme flip.** Both
+  dashboards independently use small labels above large values inside bordered
+  cards. That mutual confirmation raises confidence these are structure, not style.
+- **KPI tiles pair each metric with a tinted circular icon chip**, each in a
+  different hue. On four tiles it reads as a legend. It would not survive twelve —
+  a caution worth recording, since analytics pages grow.
+- **One selected card inverts to a solid accent fill** while its siblings stay
+  white. Selection by inversion rather than by border is decisive and reads
+  instantly at density.
+- **Status is a pill badge with a text label** — "In transit", "Processing",
+  "Received", "Paid". Text plus color, not color alone. This is the accessible
+  answer to the exact trap flagged in the Verdikt dashboard, and it comes from the
+  weaker source. Concept work can still be right about a specific thing.
+- Period filters (`Period / Day / Month / Year`) sit as a quiet segmented control
+  in the header rather than as a filter bar.
+
+Caveats consistent with the folder: perfect placeholder data, no empty or error
+states, and perspective mockups that flatter the composition.
+
+### Library balance — worth flagging
+
+The library is now nine shipped sources and three concept sources, and it is
+heavily weighted toward **automotive marketing**: Tesla, Mercedes, Rimac, Audi,
+plus three car-related concept shots. That is a lot of full-bleed photography and
+hero-plus-CTA structure, and very little of what ProfitMe actually is.
+
+Still thin or absent: `stripe/`, `linear/`, `vercel/`, `porsche/` are empty, and
+there is exactly one shipped analytics dashboard. Type and color remain undecided
+for the same reason as the first pass — the evidence is about marketing surfaces,
+and ProfitMe is a working tool someone opens daily.

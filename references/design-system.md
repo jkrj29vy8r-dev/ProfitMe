@@ -50,13 +50,30 @@ Radius scale and which size belongs to which surface class. Border weight and
 color. Shadow ramp tied to elevation level. Consistency here does more for
 "premium" than any single flourish.
 
-## Materials & glass — TBD
+## Materials & glass — partially derived (2026-08-01)
 
-Which surface classes are glass and which are solid, blur radius and background
-tint per class, the border or inner-highlight treatment that makes the edge
-read, and the solid fallback. Glass is for surfaces floating above content only.
-Record the worst-case backdrop each glass surface must stay legible over —
-contrast gets verified against that, not against a favorable screenshot.
+Which surface classes are glass, and the blur/tint values per class, remain TBD.
+The **recipe** is decided, derived from `audi/` — the one production reference
+where translucent controls sit on photography and stay legible across a bright
+sky and a near-black car body in the same scroll.
+
+1. **Restraint over drama.** Enough backdrop shows through to read as material;
+   not enough to let the backdrop's contrast swing through it. If the content
+   behind is clearly identifiable through the surface, there is too much
+   transparency.
+2. **Always a visible edge.** A border or inner highlight, so the control's
+   boundary never depends on the backdrop. This is what actually makes glass read
+   as an object rather than a smudge.
+3. **Flat label value.** Text on glass stays one fixed color and never picks up
+   tint from behind it.
+4. **Hierarchy by fill weight, not hue.** Primary and secondary differ in
+   opacity/fill, so the pair behaves identically on any backdrop.
+5. **Worst-case verification is mandatory.** Every glass surface records the
+   lightest and darkest backdrop it must survive, and contrast is checked against
+   both — never against a favorable screenshot.
+6. Floating surfaces only — nav, overlays, command palette, sticky headers. Never
+   on a large surface that animates or scroll-links. Solid fallback always
+   available.
 
 ## Motion — derived (2026-08-01)
 
@@ -135,7 +152,14 @@ structure is decided.
   consistently across dots, numerals, distribution bars and timelines. **Never
   hue alone:** every status carries a shape, icon or label as well. Two values
   that differ only in color are a defect, and profit/loss is exactly where this
-  bites.
+  bites. The pattern to follow is a **pill badge carrying a text label** —
+  "Cleared", "Review", "Flagged" — which reads without color at all.
+- **Selection by inversion.** A selected card inverts to a solid accent fill while
+  its siblings stay on the base surface. Decisive at density, and far more legible
+  than a border change.
+- **Icon chips are a small-count device.** A tinted circular icon per KPI tile
+  reads as a legend at four tiles and as noise at twelve. If a KPI row can grow,
+  do not hue-code its tiles.
 - **Numbers.** Tabular figures everywhere. The metric is the largest thing in its
   card; its unit and qualifier sit smaller and quieter beside it.
 - **Sample-data state.** The "not enough data yet" case is a labelled preview with

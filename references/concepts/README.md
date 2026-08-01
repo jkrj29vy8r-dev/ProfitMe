@@ -22,13 +22,22 @@ shipped product wins.
 
 ## Contents
 
-**RideLux car rental landing (MQoS/MultiQoS, Dribbble)** — three captures of one
-landing page concept: full page, annotated flow breakdown, and a bento value-prop
-section.
+**RideLux car rental landing** (MQoS/MultiQoS) — three captures: full page,
+annotated flow breakdown, bento value-prop section.
 
-Worth noting honestly: several patterns in this shot are on the *generic* list in
+Worth noting honestly: several patterns here are on the *generic* list in
 `CLAUDE.md` — the bento grid of stock photos, the saturated red used decoratively
 across every surface, four equal icon-topped feature cards. The useful extraction
 is narrower: the four-step "How It Works" reduction of a complex process, and the
 search/filter bar overlapping the bottom edge of the hero, which is a genuinely
 good spatial idea.
+
+**Logistics dashboard** (The Ash Design) — three captures: overview, perspective
+mockup, component closeups. **The most transferable concept work in the folder**,
+and the library's only light-mode data-dense layout, which makes it a useful
+counterweight to the dark dashboard in `dashboards/`. See `observations.md` for
+what was extracted.
+
+**Rydex car marketplace app** (Excellent Webworld) — dark mobile commerce
+concept. Useful for the detail-page tab structure and the score-triplet row;
+otherwise heavily photographic in a way that does not transfer to analytics.
