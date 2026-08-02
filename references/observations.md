@@ -280,3 +280,39 @@ premium.
 **What this pass did not do:** invent evidence. Where the library is genuinely
 silent — a specific typeface file, exact chart color mappings, table row
 density — the design system says so rather than presenting a guess as derived.
+
+---
+
+## 2026-08-02 — animations/ (6 clips, one TikTok compilation)
+
+Source: a single @webloved TikTok ("Can you believe Claude F5 did this?"),
+showing four different agency/AI-builder site builds back-to-back off a laptop
+screen — 576×1024, six segments split into separate files for the folder.
+Filed at the same reduced evidentiary weight as `concepts/`: built to read as a
+striking 9-second clip, not to survive daily use, and every site shown is a real
+studio's actual branded work, so wordmarks, copy and specific palettes are
+off-limits the same way Dribbble work already is.
+
+Four sites: **Anyflow** (lime agency site), **Monolith** (black-and-white tattoo
+studio), **Drip** (cream product e-commerce), **Dragonfly** (near-black crypto
+fund, glitch/monospace). Full breakdown of what's extracted from each is in
+`animations/README.md` rather than duplicated here.
+
+**The one finding worth stating plainly:** every hero across all four sites is a
+kinetic-type event rather than a photo or a static composition — the headline
+animating *is* the hero — and color is spent on exactly one keyword or shape per
+screen, never a themed wash. That is a faster, punchier register than the calm
+opacity-led crossfade already measured off Apple and Rimac in this file's first
+pass. It is a real alternate direction, not evidence that the existing one is
+wrong: ProfitMe is a tool a finance professional keeps open all day, and a
+kinetic-typographic hero that performs once and then has nowhere to go on
+scroll fits a marketing landing page better than a daily-use product. Filed for
+future landing-page work (the hero already reveals its headline as a scroll
+event, which is the closer relative), not pulled into `design-system.md` now —
+no component or page task is in flight to derive a token against.
+
+Lime and glitch-red are each one more data point for hues already ruled out —
+lime for the same "if everyone converges here it isn't synthesis" logic that
+disqualified blue, glitch-red as tonally wrong for a profit/loss tool where red
+already carries a specific, serious meaning. Neither changes the copper
+decision; both make it slightly better-evidenced.
