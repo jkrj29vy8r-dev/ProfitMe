@@ -491,3 +491,87 @@ touching the rig's sizing sits outside a quality-only brief. Worth a dedicated
 fix later.
 
 **Still open:** no `favicon.ico`, still a 404 on every load.
+
+---
+
+## 2026-08-03 (third pass) — 37 real reference assets, Hero locked
+
+**This is the first pass in this project with actual raw evidence for Stripe,
+Linear, Vercel and Framer** — all four previously had a README and nothing
+else. 37 unique images (deduplicated from 74 uploaded — many were exact
+duplicate re-uploads, confirmed by content hash, not just filename) landed
+this time, where the two prior attempts in this session found nothing. Filed
+under the existing folder structure would be the next step; this pass worked
+directly from the uploaded set since the constraint was quality-only,
+non-layout changes on a tight scope.
+
+**The batch, honestly assessed — not everything in it is evidence.** Roughly a
+third of the 37 (the generic 3D coin/piggy-bank renders, the "GlassFlow"
+template, the "Lumina" gradient-mesh dashboard, several unbranded stock
+dashboard mockups) are lower tier than even `concepts/` — they're stock
+assets, not shipped products, and two of them (GlassFlow, Lumina) are close to
+verbatim matches for CLAUDE.md's own "what generic means" list: purple-blue
+gradient hero, centered headline, two pill buttons, logo strip; candy
+gradient-mesh behind an entire dashboard. Treated as **negative evidence** —
+confirmation that ProfitMe's existing avoidance of both patterns is correct —
+not as material to draw from. The real signal was Apple (Vision Pro, iPhone
+13 Pro, iPhone 16 Pro), Stripe (marketing hero, actual product dashboard in
+both themes, checkout, branding settings UI), Linear, Vercel, Framer, Raycast,
+Mercury, Ramp and Brex marketing pages, plus two screenshots of ProfitMe's own
+current hero on the user's phone (both themes) supplied as a baseline, not a
+reference.
+
+**Constraint for this pass, stated by the user:** Hero locked, no layout
+redesign, preserve all functionality, quality only. That ruled out most of
+what the batch actually offers evidence for — Apple's asymmetric hero
+composition, Stripe's gradient-sampled headline, Vercel's single-gradient-word
+convention, Linear's announcement pill and single-CTA restraint, Raycast's
+device-framed hero, Brex's dot-grid texture, Mercury's isometric card
+compositions — all of it lives in hero/marketing-composition territory that is
+explicitly out of scope this round. Recording them here rather than silently
+dropping them: they are legitimate candidates for a **future pass that is not
+Hero-locked**, not judged inapplicable.
+
+**What was actually in scope and shipped, both from the existing product
+dashboard, not the Hero:**
+
+1. **KPI delta as a tinted pill**, not plain colored text. Both Stripe
+   captures and the Ramp captures show this — delta with a soft tinted
+   background matching its text color, not bare colored text. Checking it
+   against the page surfaced a real pre-existing inconsistency: `.pill` is
+   already a defined component, already used in four other places (the compare
+   card's "Up 18% YoY", the chart's "Improving" badge, the sample-data note,
+   the anomaly panel's status pills) — the rig's KPI deltas were the one
+   surface reinventing the same idea as plain text. Fixed by extending the
+   existing token vocabulary (`--positive-tint`/`--negative-tint`, already
+   used by `.pill--positive`/`.pill--negative`) rather than adding anything
+   new.
+2. **A muted previous-period line behind the current one**, on the
+   product-reveal chart. Both Stripe dashboard screenshots draw exactly this —
+   a dashed, gray, secondary line under the accent one, unlabeled, communicating
+   "better than last time" contextually rather than with a legend. Implemented
+   as a static-color, dash-patterned path whose *reveal* still rides the
+   existing scrubbed timeline (same beat as the area fill, position 0.5–0.66)
+   so it stays consistent with every other beat's "state change is a function
+   of scroll position" rule — but whose *mutedness* comes from stroke color and
+   dash pattern rather than from opacity, so it does not read as merely
+   translucent once fully revealed.
+
+**Verification.** 17 new targeted assertions (existence, paint order — ghost
+behind area/line, reveal timing on the pinned timeline, reversibility scrolling
+back up, mobile/reduced-motion resolution to a settled state, tint values
+differing between up/down, pill not stretching to tile width) plus the full
+31-assertion suite from the prior two passes — 48/48. Confirmed visually in
+both themes via screenshot. No new horizontal overflow at 1440/1024/390/320
+(1024's 40px is the already-documented pre-existing rig artifact, unchanged).
+Performance measured back-to-back against the previous commit's baseline:
+comparable, no regression — the two changes are an SVG path opacity fade and a
+background-color, neither of which touches layout or a scrubbed transform.
+
+**One test-methodology note worth keeping:** the first run of the new
+scrub-timing assertion failed (opacity 0.22 against an expected >0.5) not
+because the feature was broken, but because the scroll position sampled the
+transition mid-flight rather than after it completed — the beat spans
+timeline position 0.5–0.66 and the test landed at ~0.615. Corrected by
+targeting further into the pin distance. Recorded so a future scrub-timing
+test starts from the beat's *end* position, not a guess at "past its start."

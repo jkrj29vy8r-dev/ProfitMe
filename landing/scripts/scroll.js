@@ -340,6 +340,7 @@
       var chrome = stage.querySelector("[data-rig-chrome]");
       var area = stage.querySelector("[data-rig-area]");
       var line = stage.querySelector("[data-rig-draw]");
+      var ghost = stage.querySelector("[data-rig-ghost]");
       var dot = stage.querySelector("[data-rig-dot]");
       var ai = stage.querySelector("[data-ai]");
       var aiUser = stage.querySelector("[data-ai-user]");
@@ -359,6 +360,7 @@
       gsap.set(".dash__panels", { opacity: 0 });
       gsap.set(rows, { opacity: 0, x: -8 });
       gsap.set(area, { opacity: 0 });
+      gsap.set(ghost, { opacity: 0 });
       gsap.set(dot, { scale: 0, transformOrigin: "50% 50%" });
       gsap.set(ai, { opacity: 0, y: 34 });
       gsap.set([aiUser, aiThinking, aiAnswer], { opacity: 0, y: 8 });
@@ -413,6 +415,7 @@
         .to(".dash__panels", { opacity: 1, duration: 0.06 }, 0.42)
         .to(line, { strokeDashoffset: 0, duration: 0.22 }, 0.44)
         .to(area, { opacity: 1, duration: 0.16 }, 0.5)
+        .to(ghost, { opacity: 1, duration: 0.16 }, 0.5)
         .to(dot, { scale: 1, duration: 0.05, ease: "back.out(1.1)" }, 0.65)
         .to(rows, { opacity: 1, x: 0, duration: 0.08, stagger: 0.03 }, 0.46)
 
@@ -649,7 +652,7 @@
     if (!stage) return;
 
     var statics = stage.querySelectorAll(
-      "[data-rig-chrome], [data-rig-kpi], [data-rig-row], [data-ai], [data-ai-user], [data-ai-answer], .dash__panels, [data-rig-area]"
+      "[data-rig-chrome], [data-rig-kpi], [data-rig-row], [data-ai], [data-ai-user], [data-ai-answer], .dash__panels, [data-rig-area], [data-rig-ghost]"
     );
     statics.forEach(function (el) {
       el.style.opacity = "1";

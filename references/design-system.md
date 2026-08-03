@@ -652,6 +652,24 @@ structure is decided.
 - **Reflow, don't hide.** Narrow layouts stack modules to one column and drop KPI
   rows to a 2×2 grid. Nothing is dropped on small screens; the composition
   reflows.
+- **A delta is a pill, not colored text** (added 2026-08-03, from Stripe's and
+  Ramp's own product dashboards — the first raw evidence this file has ever had
+  for either). A KPI's change-from-last-period gets a small tinted pill
+  (`positive-tint`/`negative-tint` background, matching text color), not plain
+  colored text with no fill. ProfitMe's KPI tiles were the one place on the page
+  reinventing this instead of reusing the `.pill` component already used
+  elsewhere — brought in line, no new tokens needed. The directional arrow
+  glyph already in the copy remains the non-color signal, per the status-trio
+  rule above.
+- **A trend line can carry its own history.** A muted, dashed line for the prior
+  comparable period, drawn *behind* the current period's line in the same
+  chart — both Stripe dashboard captures do this on every sparkline. Its
+  mutedness comes from stroke color and dash pattern, not from opacity, so it
+  reads as "secondary" at full reveal rather than merely translucent — opacity
+  is reserved for the reveal choreography's own fade-in, exactly as every other
+  beat on the pinned timeline already works. No legend needed at this scale;
+  the visual grammar (thinner, dashed, gray vs. thick, solid, accent) already
+  carries the distinction redundantly.
 
 ## Layout — derived (2026-08-01)
 

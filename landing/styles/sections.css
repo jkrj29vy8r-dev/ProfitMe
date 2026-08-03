@@ -266,20 +266,33 @@
   line-height: 1.1;
 }
 
+/* A tinted pill, not plain colored text — bringing the KPI delta in line with
+   the .pill component already used four other places on this page (compare
+   card meta, the chart's "Improving" badge, the sample-data note). This was
+   the one spot on the page reinventing delta-as-plain-text instead of reusing
+   it, and every dashboard reference gathered (Stripe, Ramp) shows exactly
+   this tinted-pill treatment for the same data. inline-flex, not flex, so the
+   pill shrinks to its content instead of stretching across the tile. The
+   arrow glyph already in the copy is the non-color signal — nothing here
+   relies on the tint alone. */
 .kpi__delta {
-  font-size: var(--text-caption-size);
-  font-weight: 600;
-  margin-top: var(--space-xs);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 3px;
+  margin-top: var(--space-xs);
+  padding: 2px var(--space-sm) 2px var(--space-xs);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption-size);
+  font-weight: 600;
 }
 
 .kpi__delta--up {
   color: var(--positive);
+  background: var(--positive-tint);
 }
 .kpi__delta--down {
   color: var(--negative);
+  background: var(--negative-tint);
 }
 
 .dash__panels {
@@ -390,6 +403,20 @@
   flex: 1;
   min-height: 150px;
   overflow: visible;
+}
+
+/* Previous-period context line, drawn behind the current one — the pattern
+   both Stripe dashboard captures use for exactly this comparison. Muted
+   entirely through stroke color and a dash pattern, not through the opacity
+   GSAP animates for the reveal, so it stays legibly "secondary" at rest
+   rather than merely fading in translucent. Non-color-alone signal is the
+   dash pattern itself, same principle as everywhere else on the page. */
+.chart__ghost {
+  fill: none;
+  stroke: var(--text-tertiary);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+  stroke-linecap: round;
 }
 
 .chart__area {
