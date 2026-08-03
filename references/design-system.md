@@ -243,6 +243,26 @@ neutral ramp instead of looking like a generic Material Design drop shadow.
 | `elevation-1`  | Light | `0 1px 2px hsl(30 15% 20% / 0.06)`                  |
 | `elevation-2`  | Light | `0 8px 24px hsl(30 15% 20% / 0.10)`                 |
 
+**Hover elevation (`elevation-hover`, added 2026-08-03).** The same split
+applies, and it matters more here than at rest: a hover lift is the moment a
+surface is *supposed* to look raised, so falling back to a black drop shadow on
+dark would be at its most obviously wrong.
+
+| Token              | Mode  | Value                                                                        |
+| ------------------ | ----- | ---------------------------------------------------------------------------- |
+| `elevation-hover`  | Dark  | `0 0 0 1px hsl(28 40% 60% / .18), 0 18px 40px -12px hsl(28 60% 30% / .45)`    |
+| `elevation-hover`  | Light | `0 2px 4px hsl(30 15% 20% / .05), 0 20px 40px -12px hsl(30 20% 25% / .16)`    |
+
+On dark the raise is carried by a **warm copper bloom plus a brightened edge** —
+light gathering on the surface, rather than the surface casting a shadow down
+onto near-black where nothing would be visible. On light it is two real shadow
+layers: a tight contact shadow that keeps the card attached to the page, and a
+wide soft one that does the lifting. Both modes animate the same property, so
+the transition is identical and only the value differs.
+
+`box-shadow` repaints but never reflows. It is permitted on discrete
+hover/focus transitions and forbidden in anything per-frame or scroll-linked.
+
 ## Materials & glass — derived (2026-08-01)
 
 Blur and tint values, completing the recipe defined earlier this session from
@@ -286,10 +306,47 @@ matching both references.
 | ---------------- | ---------------------------------- | ---------------------------- |
 | `ease-entry`     | `cubic-bezier(0.16, 1, 0.3, 1)`    | Things arriving — decelerate |
 | `ease-exit`      | `cubic-bezier(0.4, 0, 1, 1)`       | Things leaving — accelerate  |
-| `ease-standard`  | `cubic-bezier(0.4, 0, 0.2, 1)`     | Property changes in place    |
+| `ease-inout`     | `cubic-bezier(0.65, 0, 0.35, 1)`   | Rest-to-rest changes         |
+| `ease-overshoot` | `cubic-bezier(0.34, 1.24, 0.64, 1)`| Arrivals that should have weight |
+| `ease-standard`  | `cubic-bezier(0.4, 0, 0.2, 1)`     | Deprecated alias of `ease-inout` |
 
-Entry and exit are deliberately different curves. Nothing uses a symmetric
-ease-in-out, and nothing springs or bounces.
+**Curve is chosen by motion type, not by component** (revised 2026-08-03; see
+the note below on what this replaced). Three kinds of movement:
+
+1. **Arrival** from an off-state → decelerate in (`ease-entry`), or
+   `ease-overshoot` where the object should feel like it has mass.
+2. **Departure** to an off-state → accelerate away (`ease-exit`).
+3. **Rest-to-rest** — hover, press, toggle, a panel opening in place →
+   `ease-inout`. This is the one that reads as expensive. A hover that starts
+   at full speed is the single most common tell of cheap UI motion.
+
+Entry and exit remain deliberately different curves. What changed is that
+rest-to-rest movement is now explicitly symmetric rather than borrowing the
+entry curve.
+
+**Overshoot has a hard ceiling: ≤8% past target, one settle, no oscillation.**
+That number is the line between weight and a bounce, and it is what makes
+"small overshoot" a specification instead of a matter of taste. In GSAP terms
+that is `back.out(1.1)`; `back.out(2)` (~12%) is already over the line and
+anything elastic or springy is banned outright. Never overshoot type, never
+overshoot anything displaying a number, and never overshoot an exit.
+
+> **Superseded rule.** Until 2026-08-03 this section read "Nothing uses a
+> symmetric ease-in-out, and nothing springs or bounces." The first half was
+> over-general: it was derived from *arrival* captures on apple.com and
+> rimac.com, where decelerate-in is correct, and then wrongly applied to
+> rest-to-rest interaction, which those captures did not cover. The second half
+> stands — nothing springs or bounces, and the ≤8% ceiling above is what keeps
+> the revision from quietly reintroducing it.
+
+### Scrubbed motion is exempt from all of the above
+
+Anything driven by scroll position (`scrub`) uses `ease: "none"`. Its timing
+already comes from the pointer or wheel; easing it a second time makes the
+surface lag the input, which reads as jank rather than polish. Discrete pops
+*inside* a scrubbed timeline — a dot appearing, a counter landing — may still
+use a curve, because they are events on the timeline rather than the scrub
+itself.
 
 ### Principles — these carry more weight than the numbers
 
@@ -335,6 +392,39 @@ ease-in-out, and nothing springs or bounces.
 9. **A sequence needs an ending.** After the last beat, hold. A choreographed
    reveal that stops the instant its final element lands reads as having been
    cut off; a beat of stillness at the end is what makes it read as finished.
+
+10. **One moving response per pointer position** (added 2026-08-03). Colour,
+    fill and edge responses may layer freely — a card can warm its fill while a
+    row inside it highlights. *Movement* may not. A card that rises 3px while
+    the row under the cursor also highlights makes the row slide out from
+    beneath the pointer as you read it. When a surface contains its own
+    hoverable rows, the surface yields the movement to the row and keeps only
+    its colour response. Implemented with `:has()` as a progressive
+    enhancement; without it both responses fire, which is busier but not
+    broken.
+
+11. **Hover is for pointers that hover** (added 2026-08-03). Every hover rule
+    is gated behind `@media (hover: hover) and (pointer: fine)`. On a
+    touchscreen `:hover` latches after a tap and stays until the user taps
+    something else — a card frozen mid-lift is one of the most recognisable
+    tells of a desktop design shipped to a phone. Focus states stay outside the
+    gate so keyboard users keep full parity.
+
+12. **The entry animation hands the element back** (added 2026-08-03). GSAP
+    leaves an inline `transform` behind when a tween finishes, and an inline
+    style beats the stylesheet — so a CSS `:hover` transform on anything GSAP
+    has animated silently does nothing. Entry belongs to the animation library;
+    the resting and interactive states belong to CSS. Every reveal therefore
+    ends with `clearProps: "transform,willChange"`. This is not a detail: it is
+    the difference between a hover that works and one that is dead on every
+    card on the page.
+
+13. **Transform needs a box** (added 2026-08-03). `transform` does not apply to
+    non-replaced inline elements, and `display: contents` elements generate no
+    box at all — so a reveal on a bare `<span>` degrades to a flat fade, and one
+    on `display: contents` does nothing whatsoever. Three such no-ops were found
+    and fixed in the landing page. Any element carrying `data-reveal-item` must
+    generate a block-level box.
 
 ### 3D scenes (WebGL) — derived 2026-08-01
 
@@ -447,9 +537,31 @@ moment is the wrong trade for a tool opened daily, however good it looks in a
 
 ## Component conventions — derived (2026-08-01)
 
+- **Hover is one of three primitives, never hand-rolled** (added 2026-08-03).
+  A component picks the one that matches what it is; it does not invent its own
+  timing or distance. All three run at `motion-lift` (240ms) on `ease-inout`.
+
+  | Primitive     | For                                          | Response                                           |
+  | ------------- | -------------------------------------------- | -------------------------------------------------- |
+  | `.lift`       | Card-like surfaces with no internal targets  | Rises 3px, gains `elevation-hover`, gradient ring fades up, fill warms |
+  | `.lift-quiet` | Rows that already have a fill and a border   | Fill and edge only — nothing moves                 |
+  | `.lift-bleed` | Bare grid rows with no fill of their own     | A highlight pad fades in behind, inset negatively; opacity only |
+
+  `.lift-quiet` resolves its colours through `--lift-quiet-bg` and
+  `--lift-quiet-edge`, so a semantic variant (a flagged row) rebinds them to its
+  own hue rather than being repainted copper. **Hover reports interactivity; it
+  must never overwrite what something means.**
+
+  `.lift-bleed` exists because the alternative — adding padding to a bare row so
+  it has a fill to change — would alter the row pitch and break the connector
+  line running between timeline dots. Drawing the highlight as a negatively
+  inset layer costs no layout at all.
+
 - **Focus ring.** 2px `copper-500`, 2px offset from the element edge. Never
   suppressed, never replaced by a background-color change alone — keyboard
   navigation must be visually unambiguous on every surface, glass included.
+  Cards additionally mirror their hover state on `:focus-visible` and
+  `:focus-within`, so a keyboard user sees the same affordance as a mouse user.
 - **Disabled.** Opacity reduced to 40%, pointer events off. Never communicated by
   color shift alone, since that fails the same test as profit/loss color-only
   encoding — pair with `cursor: not-allowed` and, where the disabled reason

@@ -363,3 +363,64 @@ hardware is a stage.
 copper decision stands, and this is the third pass that has had to say so);
 the Spline gallery's card-grid hero; Tesla's full-bleed product photography,
 which has nothing to give a product with no physical object to photograph.
+
+---
+
+## 2026-08-03 — Motion pass across the whole application
+
+**Trigger:** a direct instruction to apply one set of motion principles
+everywhere — ease-in-out, natural acceleration and deceleration, small
+overshoot, micro-interactions, hover lift, soft shadow, animated borders and
+gradients; no cheap bounce, no over-animation.
+
+**Reference handling, stated plainly.** `references/` was re-listed at the start
+of this pass: 42 files, identical to the set analysed earlier the same day —
+no new assets. The raw clips were therefore not re-opened frame by frame; the
+derivations already recorded in this file were used instead. That is a
+deliberate departure from the "re-read every asset" rule, and it is only
+defensible because the folder is provably unchanged *within the same session*.
+A later session must re-list and re-read rather than trusting this note.
+
+**The conflict this pass had to resolve.** The instruction asked for ease-in-out
+everywhere. `design-system.md` said the opposite: "Nothing uses a symmetric
+ease-in-out." Both were partly right, and the resolution is recorded in the
+Easing section — the old rule was derived from *arrival* captures and then
+over-generalised to interaction, which those captures never covered. Curve is
+now selected by motion type. Overshoot got a hard number (≤8%, one settle) so
+"small overshoot" and "cheap bounce" stop being a matter of taste.
+
+**Four defects found while implementing, none of them cosmetic:**
+
+1. **Every card hover would have been dead.** GSAP leaves an inline `transform`
+   after a tween, and inline styles beat the stylesheet — so a CSS hover lift on
+   any revealed card silently did nothing. Fixed by ending each reveal with
+   `clearProps`. Caught by asserting the inline style is empty after the entry
+   completes, not by looking at the page.
+2. **Three reveals were already no-ops.** `transform` does not apply to
+   non-replaced inline elements, and `display: contents` generates no box —
+   so two prose reveals were degrading to flat fades and the closing CTAs were
+   appearing with no animation at all. Also fixed an unclosed `<span>` found in
+   the same markup.
+3. **Two things moved for one pointer.** Hovering a timeline row lifted the
+   enclosing card as well, sliding the row out from under the cursor. Measured
+   as a 3px shift, fixed by having the card yield its movement to the row.
+   Became principle 10.
+4. **Hover would have latched on touch.** No `(hover: hover)` gate existed, so
+   tapping a card on a phone would leave it stuck mid-lift. Became principle 11.
+
+**Performance.** Measured like-for-like against the committed baseline in the
+same session, three runs each, scrubbing the pinned reveal: baseline 37.6fps
+with 13.0% of frames over 33ms, after the change 38.7fps with 5.0% over. No
+regression. Note for future passes: an earlier entry in this file reports
+50.6fps for the same sequence — that was a less loaded sandbox, not a faster
+page. Absolute frame numbers from this environment are only meaningful when
+both sides are measured minutes apart on the same machine.
+
+**Deliberately not done.** `backdrop-filter` is still never animated — the nav's
+blur is static. "Soft blur transitions" is honoured where blur is cheap
+(short timed tweens on small elements during entry, dropped to `filter: none`
+on completion) and refused where it is not (animating the blur radius of a
+large glass surface), per the existing performance contract.
+
+**Still open:** the site has no `favicon.ico` — a 404 on every page load,
+unrelated to motion, left alone rather than silently widening this pass.

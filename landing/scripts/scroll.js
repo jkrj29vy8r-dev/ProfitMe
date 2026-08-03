@@ -211,10 +211,22 @@
             rotateX: 0,
             filter: "blur(0px)",
             duration: 1.1,
-            ease: "expo.out",
+            /* Arrival with a small overshoot — the card settles ~5% past its
+               resting scale and comes back once. back.out(1.1) is the restrained
+               end of the family; anything at 2+ crosses from weight into the
+               cheap bounce the brief rules out. */
+            ease: "back.out(1.1)",
             stagger: 0.09,
             onComplete: function () {
-              gsap.set(cards, { filter: "none", willChange: "auto" });
+              /* Hand the element back to CSS. GSAP leaves an inline transform
+                 behind when it finishes, and an inline transform beats the
+                 stylesheet — leaving it would silently kill the .lift hover on
+                 every card on the page. Entry belongs to GSAP, the resting and
+                 hover states belong to CSS, and this is the handover. */
+              gsap.set(cards, {
+                filter: "none",
+                clearProps: "transform,willChange"
+              });
             }
           });
           if (icons.length) {
@@ -252,9 +264,12 @@
             rotateY: 0,
             filter: "blur(0px)",
             duration: 1.15,
-            ease: "expo.out",
+            ease: "back.out(1.1)",
             onComplete: function () {
-              gsap.set(card, { filter: "none", willChange: "auto" });
+              gsap.set(card, {
+                filter: "none",
+                clearProps: "transform,willChange"
+              });
             }
           });
         }
@@ -398,7 +413,7 @@
         .to(".dash__panels", { opacity: 1, duration: 0.06 }, 0.42)
         .to(line, { strokeDashoffset: 0, duration: 0.22 }, 0.44)
         .to(area, { opacity: 1, duration: 0.16 }, 0.5)
-        .to(dot, { scale: 1, duration: 0.05, ease: "back.out(2)" }, 0.65)
+        .to(dot, { scale: 1, duration: 0.05, ease: "back.out(1.1)" }, 0.65)
         .to(rows, { opacity: 1, x: 0, duration: 0.08, stagger: 0.03 }, 0.46)
 
         /* Beat 6 — the assistant arrives, asks, thinks, answers. The hold is
@@ -510,7 +525,7 @@
         { scale: 0, transformOrigin: "50% 50%" },
         {
           scale: 1,
-          ease: "back.out(2)",
+          ease: "back.out(1.1)",
           duration: 0.5,
           scrollTrigger: {
             trigger: dot.closest("[data-draw-scope]") || dot,
@@ -725,7 +740,7 @@
         {
           scale: 1,
           duration: 0.5,
-          ease: "back.out(2)",
+          ease: "back.out(1.1)",
           scrollTrigger: {
             trigger: dot.closest(".panel--chart") || dot,
             start: "bottom 68%",

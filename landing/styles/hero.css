@@ -13,8 +13,8 @@
   border-bottom: 1px solid transparent;
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
-  transition: border-color var(--motion-base) var(--ease-standard),
-    background-color var(--motion-base) var(--ease-standard);
+  transition: border-color var(--motion-base) var(--ease-inout),
+    background-color var(--motion-base) var(--ease-inout);
 }
 
 /* The edge only appears once the nav floats above content — before that it has
@@ -59,16 +59,55 @@
 }
 
 .nav__link {
+  position: relative;
+  isolation: isolate;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-pill);
   color: var(--text-secondary);
   text-decoration: none;
   font-size: var(--text-body-size);
-  transition: color var(--motion-fast) var(--ease-standard);
+  transition: color var(--motion-lift) var(--ease-inout);
 }
 
-.nav__link:hover {
-  color: var(--text-primary);
+/* The hover pill scales up from 92% rather than fading in flat — it reads as
+   the surface meeting the cursor. Small overshoot on the way in gives it
+   weight; the way out is a plain ease-in-out, because an overshoot on exit
+   looks like the element is being flicked away. */
+.nav__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--accent-tint);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity var(--motion-lift) var(--ease-inout),
+    transform var(--motion-lift) var(--ease-inout);
+}
+
+.nav__link:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
+  transition-timing-function: var(--ease-inout), var(--ease-overshoot);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav__link:hover::before {
+    opacity: 1;
+    transform: scale(1);
+    transition-timing-function: var(--ease-inout), var(--ease-overshoot);
+  }
+
+  .nav__link:hover {
+    color: var(--text-primary);
+  }
+
+  .theme-toggle:hover {
+    color: var(--text-primary);
+    border-color: var(--border);
+    background-color: var(--accent-tint);
+  }
 }
 
 .nav__link:focus-visible {
@@ -93,13 +132,9 @@
   border: 1px solid transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: color var(--motion-fast) var(--ease-standard),
-    border-color var(--motion-fast) var(--ease-standard);
-}
-
-.theme-toggle:hover {
-  color: var(--text-primary);
-  border-color: var(--border);
+  transition: color var(--motion-lift) var(--ease-inout),
+    border-color var(--motion-lift) var(--ease-inout),
+    background-color var(--motion-lift) var(--ease-inout);
 }
 
 .theme-toggle:focus-visible {
@@ -115,11 +150,14 @@
   height: 20px;
 }
 
+/* The incoming glyph rotates in with a small overshoot; the outgoing one just
+   accelerates away. Different curves in and out is what stops the pair from
+   reading as a single symmetric flip. */
 .theme-toggle__icons svg {
   position: absolute;
   inset: 0;
-  transition: opacity var(--motion-base) var(--ease-standard),
-    transform var(--motion-base) var(--ease-entry);
+  transition: opacity var(--motion-base) var(--ease-inout),
+    transform var(--motion-base) var(--ease-overshoot);
 }
 
 .theme-toggle .icon-sun {
@@ -250,7 +288,7 @@
   width: 1px;
   height: 40px;
   background: linear-gradient(transparent, var(--accent));
-  animation: cue-run 2600ms var(--ease-standard) infinite;
+  animation: cue-run 2600ms var(--ease-inout) infinite;
 }
 
 @keyframes cue-run {

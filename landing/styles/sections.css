@@ -601,6 +601,11 @@
 .anomaly__row--flag {
   border-color: var(--negative);
   background: var(--negative-tint);
+  /* Rebinds the shared quiet-hover so a flagged row intensifies its own red
+     instead of being repainted copper. Hover reports interactivity; it must
+     not overwrite what the row means. */
+  --lift-quiet-bg: hsl(358 70% 63% / 0.2);
+  --lift-quiet-edge: var(--negative);
 }
 
 .anomaly__what {
@@ -720,9 +725,35 @@
 }
 
 .footer__links a {
+  position: relative;
   color: var(--text-tertiary);
   text-decoration: none;
-  transition: color var(--motion-fast) var(--ease-standard);
+  transition: color var(--motion-lift) var(--ease-inout);
+}
+
+/* A rule that grows from the leading edge on hover and retracts to the same
+   edge on exit — it does not sweep out the far side, which would read as the
+   link discarding it. scaleX only, so it composites. */
+.footer__links a::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--motion-lift) var(--ease-inout);
+}
+
+.footer__links a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer__links a:hover::after {
+    transform: scaleX(1);
+  }
 }
 
 .footer__links a:hover {

@@ -24,8 +24,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color var(--motion-slow) var(--ease-standard),
-    color var(--motion-slow) var(--ease-standard);
+  transition: background-color var(--motion-slow) var(--ease-inout),
+    color var(--motion-slow) var(--ease-inout);
 }
 
 img,
@@ -138,6 +138,9 @@ svg {
 /* --- Buttons ---------------------------------------------------------- */
 
 .btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden; /* clips the sheen layer to the pill */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -152,10 +155,49 @@ svg {
   cursor: pointer;
   border: 1px solid transparent;
   white-space: nowrap;
-  transition: background-color var(--motion-fast) var(--ease-standard),
-    border-color var(--motion-fast) var(--ease-standard),
-    color var(--motion-fast) var(--ease-standard),
-    transform var(--motion-fast) var(--ease-standard);
+  /* Rest-to-rest: accelerates out of rest, decelerates into it. box-shadow is
+     in this list deliberately — it repaints but never reflows, and it only ever
+     runs on a discrete hover/focus, never per-frame or scroll-linked. */
+  transition: background-color var(--motion-lift) var(--ease-inout),
+    border-color var(--motion-lift) var(--ease-inout),
+    color var(--motion-lift) var(--ease-inout),
+    box-shadow var(--motion-lift) var(--ease-inout),
+    transform var(--motion-lift) var(--ease-inout);
+}
+
+/* The sheen: a soft highlight parked off the left edge that crosses the button
+   on hover. Only transform and opacity animate, so the "animated gradient"
+   costs a composite and nothing else. */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    var(--sheen) 48%,
+    transparent 66%
+  );
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform var(--motion-slow) var(--ease-inout),
+    opacity var(--motion-lift) var(--ease-inout);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover::after {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+}
+
+/* The sheen is a one-way gesture: on the way out it fades where it stands
+   rather than sliding backwards, which would read as a rewind. */
+.btn:not(:hover)::after {
+  transition: transform 0ms linear var(--motion-lift),
+    opacity var(--motion-lift) var(--ease-inout);
 }
 
 .btn:focus-visible {
@@ -163,8 +205,19 @@ svg {
   outline-offset: 2px;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    transform: translateY(-1.5px);
+  }
+}
+
+/* Press collapses the lift and compresses slightly. Faster than the lift and
+   on the exit curve, so it feels like the surface takes the load immediately —
+   a press that eases in reads as unresponsive. */
 .btn:active {
-  transform: scale(0.985);
+  transform: translateY(0) scale(0.985);
+  transition-duration: var(--motion-instant);
+  transition-timing-function: var(--ease-exit);
 }
 
 .btn--primary {
@@ -172,12 +225,29 @@ svg {
   color: var(--accent-contrast);
 }
 
-.btn--primary:hover {
-  background: var(--accent-hover);
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--elevation-hover);
+  }
+
+  .btn--glass:hover {
+    border-color: var(--elevation-hover-edge);
+    box-shadow: var(--elevation-hover);
+  }
+
+  /* Quiet buttons are text, not surfaces — colour change only. Lifting a
+     borderless label off the page is the kind of over-animation that makes a
+     nav feel restless. */
+  .btn--quiet:hover {
+    color: var(--text-primary);
+    transform: none;
+  }
 }
 
 .btn--primary:active {
   background: var(--accent-press);
+  box-shadow: none;
 }
 
 /* Secondary differs from primary by fill weight, not hue — so the pair reads
@@ -190,8 +260,8 @@ svg {
   backdrop-filter: blur(16px);
 }
 
-.btn--glass:hover {
-  border-color: var(--text-tertiary);
+.btn--glass:active {
+  box-shadow: none;
 }
 
 .btn--quiet {
@@ -200,8 +270,162 @@ svg {
   padding-inline: var(--space-md);
 }
 
-.btn--quiet:hover {
-  color: var(--text-primary);
+.btn--quiet::after {
+  display: none;
+}
+
+/* --- Interactive surface: the one hover-lift definition -----------------
+   Every card-like surface in the product opts into this class rather than
+   defining its own hover. One timing, one distance, one curve — a lift that
+   differs by 2px or 40ms between two cards on the same page is exactly the
+   drift this exists to prevent.
+
+   Composition:
+     - the surface rises 3px and gains elevation      (transform + box-shadow)
+     - a copper gradient ring fades up on the edge    (opacity only)
+     - the fill warms by one step                     (background-color)
+
+   Rows and list items deliberately do NOT get this — see .lift-quiet below. */
+
+.lift {
+  position: relative;
+  transition: transform var(--motion-lift) var(--ease-inout),
+    box-shadow var(--motion-lift) var(--ease-inout),
+    border-color var(--motion-lift) var(--ease-inout),
+    background-color var(--motion-lift) var(--ease-inout);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--elevation-hover);
+    background-color: var(--surface-hover);
+  }
+}
+
+/* Keyboard parity: a card reachable by tab gets the same treatment as one
+   under a cursor. focus-within so a focused control inside the card lifts it. */
+.lift:focus-visible,
+.lift:focus-within {
+  transform: translateY(-3px);
+  box-shadow: var(--elevation-hover);
+}
+
+/* The animated border ring. Drawn as a masked 1px gradient so it works over a
+   transparent card as well as an opaque one, and so only opacity animates. */
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  .lift::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      140deg,
+      var(--elevation-hover-edge),
+      transparent 42%,
+      transparent 58%,
+      var(--elevation-hover-edge)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--motion-lift) var(--ease-inout);
+  }
+
+  .lift:focus-visible::before,
+  .lift:focus-within::before {
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .lift:hover::before {
+      opacity: 1;
+    }
+  }
+}
+
+/* Quiet variant for rows inside a list. A row that lifts off its neighbours
+   reads as jitter, so this changes fill and edge only — the response is
+   legible without anything moving. */
+.lift-quiet {
+  transition: background-color var(--motion-lift) var(--ease-inout),
+    border-color var(--motion-lift) var(--ease-inout);
+}
+
+/* Indirected through two variables so a semantic variant (a flagged row, a
+   negative state) can rebind the hover to its own colour instead of being
+   overwritten with copper. Hover must never erase meaning. */
+@media (hover: hover) and (pointer: fine) {
+  .lift-quiet:hover {
+    background-color: var(--lift-quiet-bg, var(--surface-hover));
+    border-color: var(--lift-quiet-edge, var(--elevation-hover-edge));
+  }
+}
+
+/* One MOVING response per pointer position.
+   A card containing hoverable rows would otherwise react twice to a single
+   cursor: the card rises 3px while the row highlights under it, so the row
+   slides out from beneath the pointer as you read it. Colour and fill
+   responses are allowed to layer — movement is not. When the cursor is on a
+   row, the card keeps its warmed fill but stops travelling and drops its ring.
+
+   Without :has() both responses fire, which is busier but not broken — so
+   this is a progressive enhancement rather than a requirement. */
+@supports selector(:has(*)) {
+  @media (hover: hover) and (pointer: fine) {
+    .lift:has(.lift-quiet:hover),
+    .lift:has(.lift-bleed:hover) {
+      transform: none;
+    }
+
+    .lift:has(.lift-quiet:hover)::before,
+    .lift:has(.lift-bleed:hover)::before {
+      opacity: 0;
+    }
+  }
+}
+
+/* Bleed variant for rows that are not surfaces — a bare grid row with no fill
+   or padding of its own. A highlight pad is drawn behind it, inset negatively
+   so it reads as a generous target, and only its opacity animates. Chosen over
+   adding padding to the row because padding would change the row pitch and
+   break the connector line that runs between timeline dots. */
+.lift-bleed {
+  position: relative;
+  /* Without this the z-index:-1 pad escapes to the bottom of the nearest
+     stacking context and paints behind the enclosing card's opaque fill,
+     making it invisible. Isolating keeps it behind the row's own content
+     but in front of the card. */
+  isolation: isolate;
+}
+
+.lift-bleed::before {
+  content: "";
+  position: absolute;
+  inset-block: calc(var(--space-sm) * -1);
+  inset-inline: calc(var(--space-md) * -1);
+  z-index: -1;
+  pointer-events: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  opacity: 0;
+  transition: opacity var(--motion-lift) var(--ease-inout);
+}
+
+.lift-bleed:focus-within::before {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lift-bleed:hover::before {
+    opacity: 1;
+  }
 }
 
 /* --- Status pill: color is never the only signal ---------------------- */
@@ -269,6 +493,14 @@ svg {
   will-change: transform, opacity;
 }
 
+/* transform does not apply to a non-replaced inline element, so a reveal item
+   wrapping prose was rising by 0px and degrading to the flat fade the design
+   system rules out. Giving it a block box makes the choreography actually run.
+   Scoped to span so list and grid reveal items keep their own display. */
+span[data-reveal-item] {
+  display: inline-block;
+}
+
 /* A brief copper afterimage that trails each word in on scroll, then
    dissolves — see scroll.js's [data-split] handler. Absolutely positioned
    over the live word so it carries no layout weight and never changes how
@@ -306,6 +538,21 @@ svg {
 
   .sw-ghost {
     opacity: 0 !important;
+  }
+
+  /* Principle 7: the state change still reads, it just stops moving. Hover
+     keeps its elevation, edge and fill — it loses only the travel. */
+  .lift:hover,
+  .lift:focus-visible,
+  .lift:focus-within,
+  .btn:hover,
+  .btn:active {
+    transform: none !important;
+  }
+
+  /* The sheen is pure decoration; with motion suppressed it has no job. */
+  .btn::after {
+    display: none;
   }
 }
 

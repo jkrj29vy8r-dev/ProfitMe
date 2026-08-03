@@ -57,7 +57,7 @@
   opacity: var(--progress-glow, 0.35);
   /* Opacity is the only thing that responds to velocity, and opacity is
      composited, so the response is free. */
-  transition: opacity 220ms var(--ease-standard);
+  transition: opacity 220ms var(--ease-inout);
 }
 
 .progress__bar {
@@ -88,7 +88,7 @@
   opacity: var(--progress-head, 0);
   transform: translate3d(0, 0, 0);
   will-change: transform, opacity;
-  transition: opacity 260ms var(--ease-standard);
+  transition: opacity 260ms var(--ease-inout);
 }
 
 /* At rest the bar stays visible but the glow and head recede, so a stationary

@@ -57,12 +57,33 @@
   /* --- Motion ----------------------------------------------------------- */
   --motion-instant: 100ms;
   --motion-fast: 180ms;
+  --motion-lift: 240ms; /* rest-to-rest moves: hover, press, toggle */
   --motion-base: 260ms;
   --motion-slow: 420ms;
   --motion-stagger: 40ms;
 
+  /* Easing is chosen by MOTION TYPE, not by component. See design-system.md,
+     Motion → Easing. Three kinds of movement, three curves:
+
+     1. Arrivals from an off-state       → decelerate into place (entry)
+     2. Departures to an off-state       → accelerate away      (exit)
+     3. Rest-to-rest changes             → accelerate out of rest AND
+                                           decelerate into it   (inout)
+
+     Type 3 is the one that reads as expensive. A hover lift that starts at
+     full speed is the single most common tell of cheap UI motion. */
   --ease-entry: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Small overshoot: settles ~6% past target, once, then rests. The ceiling is
+     8% and a single settle — past that it stops reading as weight and starts
+     reading as a bounce, which is banned. Never use on anything that carries a
+     number, and never on exits. */
+  --ease-overshoot: cubic-bezier(0.34, 1.24, 0.64, 1);
+
+  /* Kept as an alias so existing declarations stay valid; ease-inout is the
+     same intent expressed with real symmetry. Prefer ease-inout in new code. */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* --- Type ------------------------------------------------------------- */
@@ -150,6 +171,17 @@
   --elevation-1-border: 1px solid var(--border-soft);
   --elevation-2-border: 1px solid var(--border);
 
+  /* Hover lift. On dark a drop shadow is invisible-to-murky against a near-black
+     page, so the raise is carried by a warm ambient bloom plus a brightened
+     edge — light gathering on the surface rather than the surface casting down.
+     Both modes animate the same property (box-shadow) so the transition is
+     identical; only the value differs. */
+  --elevation-hover: 0 0 0 1px hsl(28 40% 60% / 0.18),
+    0 18px 40px -12px hsl(28 60% 30% / 0.45);
+  --elevation-hover-edge: hsl(28 45% 55% / 0.4);
+  --surface-hover: var(--ink-800);
+  --sheen: hsl(0 0% 100% / 0.07);
+
   /* Glass */
   --glass-nav-bg: hsl(30 7% 10% / 0.72);
   --glass-nav-edge: hsl(0 0% 100% / 0.08);
@@ -205,6 +237,15 @@
   --elevation-1-border: 1px solid var(--border-soft);
   --elevation-2-border: 1px solid var(--border-soft);
 
+  /* Light gets a real diffuse shadow, warm-tinted to agree with the neutral
+     ramp. Two layers: a tight contact shadow that keeps the card attached to
+     the page, and a wide soft one that does the lifting. */
+  --elevation-hover: 0 2px 4px hsl(30 15% 20% / 0.05),
+    0 20px 40px -12px hsl(30 20% 25% / 0.16);
+  --elevation-hover-edge: hsl(28 45% 45% / 0.35);
+  --surface-hover: var(--paper-0);
+  --sheen: hsl(0 0% 100% / 0.7);
+
   --glass-nav-bg: hsl(32 30% 98% / 0.75);
   --glass-nav-edge: hsl(0 0% 0% / 0.06);
   --glass-overlay-bg: hsl(0 0% 100% / 0.8);
@@ -243,6 +284,11 @@
     --caution-tint: var(--caution-200);
     --elevation-1: 0 1px 2px hsl(30 15% 20% / 0.06);
     --elevation-2: 0 8px 24px hsl(30 15% 20% / 0.1);
+    --elevation-hover: 0 2px 4px hsl(30 15% 20% / 0.05),
+      0 20px 40px -12px hsl(30 20% 25% / 0.16);
+    --elevation-hover-edge: hsl(28 45% 45% / 0.35);
+    --surface-hover: var(--paper-0);
+    --sheen: hsl(0 0% 100% / 0.7);
     --glass-nav-bg: hsl(32 30% 98% / 0.75);
     --glass-nav-edge: hsl(0 0% 0% / 0.06);
     --glass-card-bg: hsl(0 0% 100% / 0.62);
