@@ -27,6 +27,30 @@
   }
 }
 
+/* Hairline rules between the figures. Four numbers floating in a row read as a
+   list; separated, they read as a measured set — the precision-grid quality the
+   porsche/ and vercel/ notes both point at. Inset from the band's full height
+   so the rule sits with the numbers rather than dividing the whole section, and
+   drawn on the item rather than as a border so the last one needs no reset. */
+@media (min-width: 900px) {
+  .proof__grid > * + * {
+    position: relative;
+  }
+
+  .proof__grid > * + *::before {
+    content: "";
+    position: absolute;
+    inset-block: 2px;
+    inset-inline-start: calc(var(--space-xl) / -2);
+    width: 1px;
+    background: linear-gradient(
+      var(--border-soft),
+      var(--border-soft) 62%,
+      transparent
+    );
+  }
+}
+
 .proof__value {
   font-size: clamp(30px, 3.2vw, 38px);
   font-weight: 600;
@@ -638,6 +662,45 @@
   }
 }
 
+/* --- Material: light catching the top edge --------------------------------
+   On dark, a surface whose border is uniform reads as a flat cut-out. Warming
+   the top edge one step suggests the panel is catching the page's ambient light
+   from above, which is what makes a surface read as a material rather than a
+   rectangle. Dark only: on a white card there is no highlight to catch and
+   faking one looks like a rendering artifact.
+
+   Done with border-top-color rather than an inset box-shadow deliberately —
+   .lift:hover replaces box-shadow wholesale, so an inset highlight would blink
+   out at the exact moment the card is meant to look most raised. */
+[data-theme="dark"] .compare__card,
+[data-theme="dark"] .trust__item,
+[data-theme="dark"] .chapter__visual,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .kpi,
+[data-theme="dark"] .anomaly__row {
+  border-top-color: hsl(30 6% 27%);
+}
+
+/* The accent card already carries a copper edge; overriding its top would break
+   the ring it draws around the section's actual point. */
+[data-theme="dark"] .compare__card--accent {
+  border-top-color: var(--accent);
+}
+
+/* These carry .lift, so they need a surface to lift. Without one the hover was
+   conjuring a background that did not exist at rest — the only card on the page
+   whose hover invented its own material. Defined by border rather than a value
+   jump, per the dark-mode elevation strategy: the section is already bg-card,
+   so a lighter fill would be a second band rather than a card. The fill change
+   then arrives on hover, where it reads as a response instead of as chrome. */
+.trust__item {
+  padding: var(--space-xl);
+  border-radius: var(--radius-md);
+  border: var(--elevation-1-border);
+  background: var(--bg-card);
+  box-shadow: var(--elevation-1);
+}
+
 .trust__item h3 {
   margin: var(--space-lg) 0 var(--space-sm);
   font-size: var(--text-h3-size);
@@ -671,16 +734,28 @@
   isolation: isolate;
 }
 
+/* Overscanned vertically because this layer is parallaxed: at inset:0 the
+   translation would drag its own edge into frame. The section clips it. */
 .close__wash {
   position: absolute;
-  inset: 0;
+  inset: -120px 0;
   z-index: -1;
+  will-change: transform;
   background: radial-gradient(
     80% 100% at 50% 100%,
     var(--accent-tint) 0%,
     transparent 70%
   );
   pointer-events: none;
+}
+
+/* The wash is only ever transformed by the parallax handler, which never runs
+   under reduced motion — so the promotion hint would buy a permanent layer for
+   an element that never moves. */
+@media (prefers-reduced-motion: reduce) {
+  .close__wash {
+    will-change: auto;
+  }
 }
 
 .close__title {

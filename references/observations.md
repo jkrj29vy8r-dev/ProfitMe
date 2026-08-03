@@ -424,3 +424,70 @@ large glass surface), per the existing performance contract.
 
 **Still open:** the site has no `favicon.ico` — a 404 on every page load,
 unrelated to motion, left alone rather than silently widening this pass.
+
+---
+
+## 2026-08-03 (second pass) — Quality pass against a brief naming external targets
+
+**Two premises of the request did not hold, and the work was scoped around
+that rather than around the request as written.**
+
+1. **No new reference assets had been added.** The brief said images and videos
+   had been placed in `references/`. The folder was re-listed at the start of
+   this pass: 42 files, identical set to the previous pass, newest raw asset
+   still 2026-08-02 17:38. A filesystem-wide search for media newer than that
+   returned nothing, inside the repo or outside it, and `git status` was clean.
+   Nothing arrived.
+
+2. **None of the 17 named URLs were reachable.** Apple, Stripe, Linear, Vercel,
+   Raycast, Supabase, Framer, Mercury, Ramp, Brex, Rippling, and the six gallery
+   sites were all requested. Every one failed: the environment's egress policy
+   answers 403 to CONNECT (`curl` returns 000), and the WebFetch path returns
+   403 as well. No design evidence could be gathered from any of them.
+
+**Worse, the library has no raw evidence for four of the six named targets.**
+`stripe/`, `linear/`, `vercel/` and `porsche/` contain a README each and no
+media at all — they always have. So "Stripe motion, Linear minimalism, Vercel
+polish, Porsche elegance" could not be derived from the library either. Per
+CLAUDE.md ("if `references/` is empty or thin, say so and proceed on craft
+fundamentals") those four were treated as craft targets rather than as evidence,
+and nothing in this pass claims to be derived from them.
+
+**What the pass actually did:** audited the built page against the extraction
+dimensions and fixed what was measurably wrong, rather than inventing changes to
+look responsive to the brief.
+
+- **A hover with no surface under it.** The trust items carried the lift
+  primitive while having no fill and no border, so hovering them conjured a card
+  that did not exist at rest — the only hover on the page that invented its own
+  material. They now have a resting surface, border-defined rather than a value
+  jump because the section is already `bg-card`. Became a component rule.
+- **Three dead motion handlers.** `[data-draw]`, `[data-draw-dot]` and
+  `[data-parallax]` all ran `querySelectorAll` sweeps at init and matched
+  nothing — the page had no parallax at all, and the chart draws through the
+  pinned timeline's own beat. The first two were deleted; the third was wired to
+  something that deserved it.
+- **Depth, added the way that does not fight the entry animations.** The closing
+  section's wash is now parallaxed. Sliding the data panels instead would have
+  put a second GSAP tween on `y` for elements the reveal already animates —
+  the exact two-systems-one-property conflict this file has warned about since
+  the first pass — and would make the reader chase the number they are reading.
+- **Material.** Dark surfaces warm their top border one step, so a panel reads
+  as catching light from above rather than as a hole cut in the page.
+- **Rhythm.** Hairline rules between the four proof figures.
+
+**Measurement notes.** A first perf reading suggested a regression (35.8fps,
+25% long frames). Re-measured back-to-back against the committed baseline
+minutes later: baseline 36.9fps/14.0%, current 38.1fps/8.5% — no regression, the
+first number was sandbox noise. This is the second time in two passes that an
+isolated frame-rate reading here has been misleading; **only back-to-back
+comparisons on this machine mean anything.**
+
+Also confirmed **pre-existing** and left alone: a 40px horizontal layout
+overflow at exactly 1024px wide, caused by the laptop rig's fixed 1000px layout
+box (CSS `transform: scale()` does not shrink a layout box). Identical in the
+baseline, invisible to users because `body` sets `overflow-x: hidden`, and
+touching the rig's sizing sits outside a quality-only brief. Worth a dedicated
+fix later.
+
+**Still open:** no `favicon.ico`, still a 404 on every load.

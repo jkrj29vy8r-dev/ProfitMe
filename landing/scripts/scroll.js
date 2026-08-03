@@ -496,45 +496,11 @@
       );
     });
 
-    /* --- 7. Chart reveal, scrubbed -------------------------------------- */
-    /* The line draws under the user's thumb rather than on a fixed timer, so
-       the chart is genuinely synchronised with scroll position. */
-    document.querySelectorAll("[data-draw]").forEach(function (path) {
-      var len = path.getTotalLength ? path.getTotalLength() : 500;
-      gsap.set(path, {
-        strokeDasharray: len,
-        strokeDashoffset: len,
-        opacity: 1
-      });
-
-      gsap.to(path, {
-        strokeDashoffset: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: path.closest("[data-draw-scope]") || path,
-          start: "top 78%",
-          end: "bottom 62%",
-          scrub: 0.4
-        }
-      });
-    });
-
-    document.querySelectorAll("[data-draw-dot]").forEach(function (dot) {
-      gsap.fromTo(
-        dot,
-        { scale: 0, transformOrigin: "50% 50%" },
-        {
-          scale: 1,
-          ease: "back.out(1.1)",
-          duration: 0.5,
-          scrollTrigger: {
-            trigger: dot.closest("[data-draw-scope]") || dot,
-            start: "bottom 66%",
-            once: true
-          }
-        }
-      );
-    });
+    /* The generic [data-draw] / [data-draw-dot] scrubbed-chart handlers were
+       removed on 2026-08-03: nothing in the page used them. The product-reveal
+       chart draws through the pinned timeline's own [data-rig-draw] beat, and
+       restRig() covers the unpinned path. Two dead querySelectorAll sweeps at
+       init, plus a third in restAll(), were the only thing they did. */
 
     /* --- 8. Bars and rails grow, scrubbed ------------------------------- */
     document.querySelectorAll("[data-grow]").forEach(function (el) {
@@ -806,10 +772,6 @@
         el.style.transform = "none";
         el.style.filter = "none";
       });
-    document.querySelectorAll("[data-draw]").forEach(function (p) {
-      p.style.strokeDasharray = "none";
-      p.style.strokeDashoffset = "0";
-    });
     document.querySelectorAll("[data-icon-draw]").forEach(function (p) {
       p.style.strokeDasharray = "none";
       p.style.strokeDashoffset = "0";

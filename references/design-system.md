@@ -557,6 +557,35 @@ moment is the wrong trade for a tool opened daily, however good it looks in a
   line running between timeline dots. Drawing the highlight as a negatively
   inset layer costs no layout at all.
 
+- **A surface that responds must exist at rest** (added 2026-08-03). Applying a
+  hover treatment to an element with no fill and no border means the hover
+  *invents* a material that was not there a moment earlier — the card appears
+  out of nothing under the cursor. Found on the trust items, which carried the
+  lift primitive while being visually bare. Before giving anything a hover, check
+  it is a surface; if it should respond, give it a resting material first.
+
+- **Light comes from above** (added 2026-08-03). On dark, panels warm their
+  **top border one step** (`hsl(30 6% 27%)` against a `border-soft` body). A
+  uniformly bordered rectangle on near-black reads as a cut-out; one lit edge
+  reads as a material catching the page's ambient light. This is the cheapest
+  available version of the material quality the `porsche/` notes point at, and
+  it costs nothing to render. Light mode is deliberately excluded — a white card
+  has no highlight to catch and faking one looks like a rendering artifact.
+
+  Implemented as `border-top-color`, not an inset `box-shadow`, because the hover
+  primitive replaces `box-shadow` wholesale — an inset highlight would blink out
+  at the exact moment the card is meant to look most raised.
+
+- **Depth is added by moving light, not by sliding content** (added 2026-08-03).
+  Parallax on a data panel makes the reader chase the number they are trying to
+  read, and on this page it would also collide with the entry tweens already
+  writing `y` to those elements. The safe and better-looking version parallaxes
+  a **decorative light layer** behind the content — a wash, a glow, a gradient —
+  which adds the depth cue without moving anything anyone is reading. Such a
+  layer must be overscanned (`inset: -120px 0`) or its own edge drags into frame,
+  and its `will-change` must be released under reduced motion, where it never
+  moves at all.
+
 - **Focus ring.** 2px `copper-500`, 2px offset from the element edge. Never
   suppressed, never replaced by a background-color change alone — keyboard
   navigation must be visually unambiguous on every surface, glass included.
