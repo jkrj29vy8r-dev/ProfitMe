@@ -1,0 +1,412 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mg-ground {
+      position: absolute;
+      inset: 0;
+      background: #fbfaf8;
+    }
+
+    .mg-eyebrow {
+      position: absolute;
+      left: 140px;
+      top: 112px;
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a5220;
+    }
+
+    .mg-title {
+      position: absolute;
+      left: 140px;
+      top: 156px;
+      font-size: 76px;
+      font-weight: 600;
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      color: #231f1a;
+    }
+
+    .mg-lead-label {
+      position: absolute;
+      left: 140px;
+      top: 292px;
+      height: 24px;
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6f675f;
+    }
+    /* The running figure below starts as revenue and ends as what is left of
+       it, so the label has to travel with it. Two spans crossfading in place
+       rather than a text swap: seeking backwards has to restore the earlier
+       word, and only an animated property does that reliably. */
+    .mg-lead-label span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      white-space: nowrap;
+    }
+
+    .mg-lead-value {
+      position: absolute;
+      left: 140px;
+      top: 320px;
+      font-size: 68px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: #231f1a;
+    }
+
+    .mg-bar {
+      position: absolute;
+      left: 140px;
+      top: 432px;
+      width: 1640px;
+      height: 78px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(149, 88, 35, 0.06);
+    }
+
+    .mg-seg {
+      position: absolute;
+      top: 0;
+      height: 78px;
+      transform-origin: left center;
+    }
+    .mg-seg-cost { background: rgba(35, 31, 26, 0.42); }
+    .mg-seg-keep { background: #955823; }
+
+    .mg-legend {
+      position: absolute;
+      left: 140px;
+      top: 542px;
+      width: 1640px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .mg-leg {
+      flex: 1;
+    }
+
+    .mg-leg-name {
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #6f675f;
+      margin-bottom: 8px;
+    }
+
+    .mg-leg-amt {
+      font-size: 30px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+      color: #231f1a;
+    }
+
+    .mg-out {
+      position: absolute;
+      left: 140px;
+      top: 668px;
+      width: 1640px;
+      padding: 34px 40px 36px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(149, 88, 35, 0.42);
+      background: rgba(149, 88, 35, 0.08);
+      display: flex;
+      align-items: baseline;
+      gap: 28px;
+    }
+
+    .mg-out-label {
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6f675f;
+    }
+
+    .mg-out-value {
+      font-size: 76px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: #8a5220;
+    }
+
+    .mg-out-note {
+      font-size: 27px;
+      font-weight: 400;
+      color: #6f675f;
+      margin-left: auto;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="03-margin"
+    data-start="0"
+    data-duration="6"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      class="clip mg-ground"
+      id="f03-margin-mg-ground"
+      data-start="0"
+      data-duration="6"
+      data-track-index="0"
+    ></div>
+
+    <div
+      class="clip mg-eyebrow"
+      id="f03-margin-eyebrow"
+      data-start="0"
+      data-duration="6"
+      data-track-index="1"
+    >
+      Margin
+    </div>
+
+    <div
+      class="clip mg-title"
+      id="f03-margin-title"
+      data-start="0"
+      data-duration="6"
+      data-track-index="2"
+    >
+      Find the margin you are losing.
+    </div>
+
+    <div
+      class="clip mg-lead-label"
+      id="f03-margin-lead-label"
+      data-start="0"
+      data-duration="6"
+      data-track-index="3"
+    >
+      <span id="f03-margin-lab-rev">Revenue</span>
+      <span id="f03-margin-lab-rem">Remaining</span>
+    </div>
+
+    <div
+      class="clip mg-lead-value"
+      id="f03-margin-lead-value"
+      data-start="0"
+      data-duration="6"
+      data-track-index="4"
+    >
+      €184,200
+    </div>
+
+    <div
+      class="clip mg-bar"
+      id="f03-margin-bar"
+      data-start="0"
+      data-duration="6"
+      data-track-index="5"
+    >
+      <div class="mg-seg mg-seg-cost" id="f03-margin-s0" style="left: 0; width: 821px"></div>
+      <div class="mg-seg mg-seg-cost" id="f03-margin-s1" style="left: 821px; width: 132px"></div>
+      <div class="mg-seg mg-seg-cost" id="f03-margin-s2" style="left: 953px; width: 85px"></div>
+      <div class="mg-seg mg-seg-cost" id="f03-margin-s3" style="left: 1038px; width: 190px"></div>
+      <div class="mg-seg mg-seg-cost" id="f03-margin-s4" style="left: 1228px; width: 132px"></div>
+      <div class="mg-seg mg-seg-keep" id="f03-margin-s5" style="left: 1360px; width: 280px"></div>
+    </div>
+
+    <div
+      class="clip mg-legend"
+      id="f03-margin-mg-legend"
+      data-start="0"
+      data-duration="6"
+      data-track-index="6"
+    >
+      <div class="mg-leg" id="f03-margin-l0">
+        <div class="mg-leg-name">COGS</div>
+        <div class="mg-leg-amt">−€92,300</div>
+      </div>
+      <div class="mg-leg" id="f03-margin-l1">
+        <div class="mg-leg-name">Payment fees</div>
+        <div class="mg-leg-amt">−€14,800</div>
+      </div>
+      <div class="mg-leg" id="f03-margin-l2">
+        <div class="mg-leg-name">Refunds</div>
+        <div class="mg-leg-amt">−€9,600</div>
+      </div>
+      <div class="mg-leg" id="f03-margin-l3">
+        <div class="mg-leg-name">Support time</div>
+        <div class="mg-leg-amt">−€21,400</div>
+      </div>
+      <div class="mg-leg" id="f03-margin-l4">
+        <div class="mg-leg-name">Other</div>
+        <div class="mg-leg-amt">−€14,860</div>
+      </div>
+    </div>
+
+    <div
+      class="clip mg-out"
+      id="f03-margin-out"
+      data-start="0"
+      data-duration="6"
+      data-track-index="7"
+    >
+      <div class="mg-out-label">Contribution</div>
+      <div class="mg-out-value" id="f03-margin-out-value">€31,240</div>
+      <div class="mg-out-note">16.9% of revenue</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var ENTRY = "power3.out";
+
+      function group(n) {
+        var s = String(n);
+        var out = "";
+        for (var i = 0; i < s.length; i++) {
+          if (i > 0 && (s.length - i) % 3 === 0) out += ",";
+          out += s[i];
+        }
+        return out;
+      }
+
+      // Scene 1 (0.0-0.8s) — eyebrow + title.
+      tl.fromTo(
+        "#f03-margin-eyebrow",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.35, ease: ENTRY },
+        0.0
+      );
+      tl.fromTo(
+        "#f03-margin-title",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        0.1
+      );
+
+      // Scene 2 (0.8-1.4s) — the figure the whole frame spends down.
+      tl.fromTo(
+        ["#f03-margin-lead-label", "#f03-margin-lead-value"],
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: ENTRY, stagger: 0.04 },
+        0.85
+      );
+      tl.fromTo(
+        "#f03-margin-bar",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: ENTRY },
+        1.05
+      );
+
+      // Scene 3 (1.4-3.6s) — five deductions grow from zero in cascade. Each
+      // segment is absolutely placed and scales on its own origin, so a bar
+      // landing never shifts its neighbours. The lead figure steps down with
+      // each one — it tweens to the new value, never re-grows from zero.
+      // The label hands over as the descent starts: "Revenue" is only true of
+      // the opening figure, and leaving it above a shrinking number would put
+      // a false statement on screen.
+      tl.set("#f03-margin-lab-rem", { opacity: 0 }, 0);
+      tl.to("#f03-margin-lab-rev", { opacity: 0, duration: 0.3, ease: "power2.in" }, 1.35);
+      tl.fromTo(
+        "#f03-margin-lab-rem",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: ENTRY },
+        1.45
+      );
+
+      var costs = [92300, 14800, 9600, 21400, 14860];
+      var running = 184200;
+      for (var i = 0; i < 5; i++) {
+        var at = 1.45 + i * 0.34;
+        tl.fromTo(
+          "#f03-margin-s" + i,
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.42, ease: "power2.out" },
+          at
+        );
+        tl.fromTo(
+          "#f03-margin-l" + i,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.32, ease: ENTRY },
+          at + 0.06
+        );
+
+        (function (from, to) {
+          var box = { v: from };
+          tl.add(
+            gsap.to(box, {
+              v: to,
+              duration: 0.34,
+              ease: "power1.inOut",
+              onUpdate: function () {
+                document.getElementById("f03-margin-lead-value").textContent =
+                  "€" + group(Math.round(box.v));
+              },
+            }),
+            at + 0.1
+          );
+        })(running, running - costs[i]);
+        running -= costs[i];
+      }
+
+      // Scene 4 (3.6-4.6s) — what survives, in copper.
+      tl.fromTo(
+        "#f03-margin-s5",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.5, ease: "power3.out" },
+        3.62
+      );
+      tl.fromTo(
+        "#f03-margin-out",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        3.8
+      );
+
+      // Scene 5 (4.6-5.5s) — hold. No exit tween.
+      window.__timelines["03-margin"] = tl;
+    })();
+  </script>
+</template>

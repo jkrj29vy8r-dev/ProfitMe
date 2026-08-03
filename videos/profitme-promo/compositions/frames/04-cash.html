@@ -1,0 +1,346 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .cs-ground {
+      position: absolute;
+      inset: 0;
+      background: #fbfaf8;
+    }
+
+    .cs-eyebrow {
+      position: absolute;
+      left: 140px;
+      top: 112px;
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a5220;
+    }
+
+    .cs-title {
+      position: absolute;
+      left: 140px;
+      top: 156px;
+      font-size: 76px;
+      font-weight: 600;
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      color: #231f1a;
+    }
+
+    .cs-chart {
+      position: absolute;
+      left: 140px;
+      top: 306px;
+      width: 1640px;
+      height: 356px;
+    }
+
+    .cs-axis {
+      position: absolute;
+      left: 460px;
+      top: 40px;
+      width: 1180px;
+      height: 2px;
+      background: rgba(35, 31, 26, 0.16);
+      transform-origin: left center;
+    }
+
+    .cs-tick {
+      position: absolute;
+      top: 8px;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #6f675f;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cs-row {
+      position: absolute;
+      left: 0;
+      width: 1640px;
+      height: 62px;
+    }
+
+    .cs-name {
+      position: absolute;
+      left: 0;
+      top: 8px;
+      font-size: 27px;
+      font-weight: 500;
+      color: #231f1a;
+    }
+
+    .cs-amt {
+      position: absolute;
+      left: 250px;
+      top: 8px;
+      width: 170px;
+      text-align: right;
+      font-size: 27px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: #231f1a;
+    }
+
+    .cs-guide {
+      position: absolute;
+      left: 460px;
+      top: 22px;
+      height: 2px;
+      background: rgba(149, 88, 35, 0.18);
+      transform-origin: left center;
+    }
+
+    .cs-dot {
+      position: absolute;
+      top: 12px;
+      width: 22px;
+      height: 22px;
+      margin-left: -11px;
+      border-radius: 50%;
+      background: #955823;
+    }
+
+    .cs-band {
+      position: absolute;
+      left: 140px;
+      top: 690px;
+      width: 1640px;
+      height: 132px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(149, 88, 35, 0.42);
+      background: rgba(149, 88, 35, 0.08);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      gap: 28px;
+    }
+
+    .cs-band-value {
+      font-size: 68px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: #8a5220;
+    }
+
+    .cs-band-label {
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6f675f;
+    }
+
+    .cs-band-note {
+      margin-left: auto;
+      font-size: 27px;
+      font-weight: 400;
+      color: #6f675f;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="04-cash"
+    data-start="0"
+    data-duration="5.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      class="clip cs-ground"
+      id="f04-cash-cs-ground"
+      data-start="0"
+      data-duration="5.5"
+      data-track-index="0"
+    ></div>
+
+    <div
+      class="clip cs-eyebrow"
+      id="f04-cash-eyebrow"
+      data-start="0"
+      data-duration="5.5"
+      data-track-index="1"
+    >
+      Cash
+    </div>
+
+    <div
+      class="clip cs-title"
+      id="f04-cash-title"
+      data-start="0"
+      data-duration="5.5"
+      data-track-index="2"
+    >
+      Know when the money actually lands.
+    </div>
+
+    <div
+      class="clip cs-chart"
+      id="f04-cash-cs-chart"
+      data-start="0"
+      data-duration="5.5"
+      data-track-index="3"
+    >
+      <div class="cs-axis" id="f04-cash-axis"></div>
+      <div class="cs-tick" id="f04-cash-t0" style="left: 460px">Invoiced</div>
+      <div class="cs-tick" id="f04-cash-t1" style="left: 1050px">Day 20</div>
+      <div class="cs-tick" id="f04-cash-t2" style="left: 1560px">Day 40</div>
+
+      <div class="cs-row" id="f04-cash-r0" style="top: 96px">
+        <div class="cs-name">Beacon Group</div>
+        <div class="cs-amt">€9,640</div>
+        <div class="cs-guide" id="f04-cash-g0" style="width: 148px"></div>
+        <div class="cs-dot" style="left: 608px"></div>
+      </div>
+      <div class="cs-row" id="f04-cash-r1" style="top: 162px">
+        <div class="cs-name">Northwind Ltd</div>
+        <div class="cs-amt">€24,100</div>
+        <div class="cs-guide" id="f04-cash-g1" style="width: 354px"></div>
+        <div class="cs-dot" style="left: 814px"></div>
+      </div>
+      <div class="cs-row" id="f04-cash-r2" style="top: 228px">
+        <div class="cs-name">Halcyon SA</div>
+        <div class="cs-amt">€17,900</div>
+        <div class="cs-guide" id="f04-cash-g2" style="width: 767px"></div>
+        <div class="cs-dot" style="left: 1227px"></div>
+      </div>
+      <div class="cs-row" id="f04-cash-r3" style="top: 294px">
+        <div class="cs-name">Verity Co</div>
+        <div class="cs-amt">€5,220</div>
+        <div class="cs-guide" id="f04-cash-g3" style="width: 1121px"></div>
+        <div class="cs-dot" style="left: 1581px"></div>
+      </div>
+    </div>
+
+    <div
+      class="clip cs-band"
+      id="f04-cash-band"
+      data-start="0"
+      data-duration="5.5"
+      data-track-index="4"
+    >
+      <div class="cs-band-value" id="f04-cash-gap">38 days</div>
+      <div class="cs-band-label">Cash gap</div>
+      <div class="cs-band-note">
+        A profitable month you cannot fund is still a problem.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var ENTRY = "power3.out";
+
+      // Scene 1 (0.0-0.8s) — eyebrow + title.
+      tl.fromTo(
+        "#f04-cash-eyebrow",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.35, ease: ENTRY },
+        0.0
+      );
+      tl.fromTo(
+        "#f04-cash-title",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        0.1
+      );
+
+      // Scene 2 (0.8-2.2s) — the axis draws, then four rows cascade at 40ms.
+      // Each row's guide extends to its own settlement day, so the spread is
+      // read as distance rather than stated.
+      tl.fromTo(
+        "#f04-cash-axis",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.55, ease: "power3.inOut" },
+        0.85
+      );
+      tl.fromTo(
+        ["#f04-cash-t0", "#f04-cash-t1", "#f04-cash-t2"],
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: ENTRY, stagger: 0.04 },
+        1.15
+      );
+
+      for (var i = 0; i < 4; i++) {
+        var at = 1.3 + i * 0.16;
+        tl.fromTo(
+          "#f04-cash-r" + i,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.34, ease: ENTRY },
+          at
+        );
+        tl.fromTo(
+          "#f04-cash-g" + i,
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.46, ease: "power2.out" },
+          at + 0.05
+        );
+      }
+
+      // Scene 3 (2.2-3.6s) — the span the rows just described, named. The
+      // figure never appears without its label beside it.
+      tl.fromTo(
+        "#f04-cash-band",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        2.35
+      );
+
+      var box = { v: 0 };
+      tl.add(
+        gsap.to(box, {
+          v: 38,
+          duration: 0.8,
+          ease: "power2.out",
+          onUpdate: function () {
+            document.getElementById("f04-cash-gap").textContent =
+              Math.round(box.v) + " days";
+          },
+        }),
+        2.36
+      );
+
+      // Scene 4 (3.6-5.0s) — hold. No exit tween.
+      window.__timelines["04-cash"] = tl;
+    })();
+  </script>
+</template>

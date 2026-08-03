@@ -1,1 +1,7 @@
 node_modules/
+
+# HyperFrames render artefacts and capture cache
+videos/*/renders/
+videos/*/snapshots/
+videos/*/capture/
+videos/*/.hyperframes/

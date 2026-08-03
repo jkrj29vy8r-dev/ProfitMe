@@ -1,0 +1,285 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sg-ground {
+      position: absolute;
+      inset: 0;
+      background: #fbfaf8;
+    }
+
+    .sg-eyebrow {
+      position: absolute;
+      left: 140px;
+      top: 112px;
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a5220;
+    }
+
+    .sg-title {
+      position: absolute;
+      left: 140px;
+      top: 156px;
+      font-size: 76px;
+      font-weight: 600;
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      color: #231f1a;
+    }
+
+    .sg-rows {
+      position: absolute;
+      left: 140px;
+      top: 322px;
+      width: 1640px;
+    }
+
+    .sg-row {
+      position: relative;
+      height: 128px;
+      margin-bottom: 20px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(149, 88, 35, 0.2);
+      background: rgba(149, 88, 35, 0.04);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      gap: 32px;
+    }
+
+    .sg-mark {
+      width: 6px;
+      height: 62px;
+      border-radius: 3px;
+      flex: none;
+    }
+    .sg-mark-flag { background: #b02830; }
+    .sg-mark-rev { background: #955823; }
+    .sg-mark-ok { background: #1d6644; }
+
+    .sg-text {
+      flex: 1;
+    }
+
+    .sg-head {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #231f1a;
+      margin-bottom: 8px;
+    }
+
+    .sg-sub {
+      font-size: 23px;
+      font-weight: 400;
+      color: #6f675f;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sg-pill {
+      flex: none;
+      padding: 12px 28px;
+      border-radius: 100px;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .sg-pill-flag {
+      color: #b02830;
+      background: rgba(192, 44, 49, 0.1);
+      border: 1.5px solid rgba(192, 44, 49, 0.34);
+    }
+    .sg-pill-rev {
+      color: #8a5220;
+      background: rgba(149, 88, 35, 0.1);
+      border: 1.5px solid rgba(149, 88, 35, 0.34);
+    }
+    .sg-pill-ok {
+      color: #1d6644;
+      background: rgba(34, 117, 78, 0.1);
+      border: 1.5px solid rgba(34, 117, 78, 0.34);
+    }
+
+    .sg-foot {
+      position: absolute;
+      left: 140px;
+      top: 790px;
+      font-size: 27px;
+      font-weight: 400;
+      color: #6f675f;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="05-signals"
+    data-start="0"
+    data-duration="5.6"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      class="clip sg-ground"
+      id="f05-signals-sg-ground"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="0"
+    ></div>
+
+    <div
+      class="clip sg-eyebrow"
+      id="f05-signals-eyebrow"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="1"
+    >
+      Signals
+    </div>
+
+    <div
+      class="clip sg-title"
+      id="f05-signals-title"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="2"
+    >
+      Get told before it becomes a quarter.
+    </div>
+
+    <div
+      class="clip sg-rows"
+      id="f05-signals-sg-rows"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="3"
+    >
+      <div class="sg-row" id="f05-signals-r0">
+        <div class="sg-mark sg-mark-flag"></div>
+        <div class="sg-text">
+          <div class="sg-head">Legacy plan margin turned negative</div>
+          <div class="sg-sub">411 accounts · −9% margin this month</div>
+        </div>
+        <div class="sg-pill sg-pill-flag">Flagged</div>
+      </div>
+
+      <div class="sg-row" id="f05-signals-r1">
+        <div class="sg-mark sg-mark-rev"></div>
+        <div class="sg-text">
+          <div class="sg-head">Payment fees up 1.4 pts</div>
+          <div class="sg-sub">Provider mix changed on 12 Oct</div>
+        </div>
+        <div class="sg-pill sg-pill-rev">Review</div>
+      </div>
+
+      <div class="sg-row" id="f05-signals-r2">
+        <div class="sg-mark sg-mark-ok"></div>
+        <div class="sg-text">
+          <div class="sg-head">Atlas Pro margin holding</div>
+          <div class="sg-sub">61% contribution, steady 4 months</div>
+        </div>
+        <div class="sg-pill sg-pill-ok">Healthy</div>
+      </div>
+    </div>
+
+    <div
+      class="clip sg-foot"
+      id="f05-signals-foot"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="4"
+    >
+      Every flag arrives with the cause already attached.
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var ENTRY = "power3.out";
+
+      // Scene 1 (0.0-0.8s) — eyebrow + title.
+      tl.fromTo(
+        "#f05-signals-eyebrow",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.35, ease: ENTRY },
+        0.0
+      );
+      tl.fromTo(
+        "#f05-signals-title",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        0.1
+      );
+
+      // Scene 2 (0.8-2.8s) — three rows resolve top to bottom. The status pill
+      // lands after its row so the written word is what completes the read;
+      // strip the colour out and the meaning survives intact.
+      for (var i = 0; i < 3; i++) {
+        var at = 0.9 + i * 0.5;
+        tl.fromTo(
+          "#f05-signals-r" + i,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.42, ease: ENTRY },
+          at
+        );
+        tl.fromTo(
+          "#f05-signals-r" + i + " .sg-mark",
+          { scaleY: 0 },
+          { scaleY: 1, duration: 0.36, ease: "power2.out" },
+          at + 0.08
+        );
+        tl.fromTo(
+          "#f05-signals-r" + i + " .sg-pill",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.34, ease: ENTRY },
+          at + 0.2
+        );
+      }
+
+      // Scene 3 (2.8-3.6s) — the line that separates an alert from a diagnosis.
+      tl.fromTo(
+        "#f05-signals-foot",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.45, ease: ENTRY },
+        2.9
+      );
+
+      // Scene 4 (3.6-5.0s) — hold. No exit tween.
+      window.__timelines["05-signals"] = tl;
+    })();
+  </script>
+</template>

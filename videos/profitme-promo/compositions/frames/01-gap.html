@@ -1,0 +1,284 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .gap-ground {
+      position: absolute;
+      inset: 0;
+      background: #fbfaf8;
+    }
+
+    .gap-eyebrow {
+      position: absolute;
+      left: 140px;
+      top: 132px;
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a5220;
+    }
+
+    .gap-head {
+      position: absolute;
+      left: 140px;
+      font-size: 92px;
+      font-weight: 600;
+      line-height: 0.98;
+      letter-spacing: -0.035em;
+      color: #231f1a;
+    }
+    .gap-head-a { top: 188px; }
+    .gap-head-b { top: 300px; }
+
+    .gap-cards {
+      position: absolute;
+      left: 140px;
+      top: 486px;
+      width: 1640px;
+      display: flex;
+      gap: 40px;
+    }
+
+    .gap-card {
+      flex: 1;
+      padding: 44px 48px 46px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(149, 88, 35, 0.2);
+      background: rgba(149, 88, 35, 0.04);
+    }
+    .gap-card-lead {
+      border-color: rgba(149, 88, 35, 0.42);
+      background: rgba(149, 88, 35, 0.08);
+    }
+
+    .gap-card-label {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6f675f;
+      margin-bottom: 26px;
+    }
+
+    .gap-card-value {
+      font-size: 104px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: #231f1a;
+    }
+    .gap-card-lead .gap-card-value {
+      color: #8a5220;
+    }
+
+    .gap-card-note {
+      margin-top: 24px;
+      font-size: 25px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #6f675f;
+    }
+
+    .gap-rule {
+      position: absolute;
+      left: 140px;
+      top: 452px;
+      height: 4px;
+      width: 1640px;
+      border-radius: 2px;
+      background: #955823;
+      transform-origin: left center;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="01-gap"
+    data-start="0"
+    data-duration="5.6"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      class="clip gap-ground"
+      id="f01-gap-gap-ground"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="0"
+    ></div>
+
+    <div
+      class="clip gap-eyebrow"
+      id="f01-gap-eyebrow"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="1"
+    >
+      Profit intelligence
+    </div>
+
+    <div
+      class="clip gap-head gap-head-a"
+      id="f01-gap-head-a"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="2"
+    >
+      Revenue is a headline.
+    </div>
+
+    <div
+      class="clip gap-head gap-head-b"
+      id="f01-gap-head-b"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="3"
+    >
+      Profit is the story.
+    </div>
+
+    <div
+      class="clip gap-rule"
+      id="f01-gap-rule"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="4"
+    ></div>
+
+    <div
+      class="clip gap-cards"
+      id="f01-gap-gap-cards"
+      data-start="0"
+      data-duration="5.6"
+      data-track-index="5"
+    >
+      <div class="gap-card" id="f01-gap-card-a">
+        <div class="gap-card-label">Reported revenue</div>
+        <div class="gap-card-value" id="f01-gap-value-a">€0</div>
+        <div class="gap-card-note">The number that gets celebrated.</div>
+      </div>
+      <div class="gap-card gap-card-lead" id="f01-gap-card-b">
+        <div class="gap-card-label">Actual contribution</div>
+        <div class="gap-card-value" id="f01-gap-value-b">€0</div>
+        <div class="gap-card-note">The number that decides next year.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      var ENTRY = "power3.out";
+
+      // Grouped by hand rather than via toLocaleString: locale data is not
+      // guaranteed identical on the render machine, and the renderer seeks
+      // frame-by-frame, so the digits must be a pure function of position.
+      function group(n) {
+        var s = String(n);
+        var out = "";
+        for (var i = 0; i < s.length; i++) {
+          if (i > 0 && (s.length - i) % 3 === 0) out += ",";
+          out += s[i];
+        }
+        return out;
+      }
+
+      function euro(el, to) {
+        var box = { v: 0 };
+        return gsap.to(box, {
+          v: to,
+          duration: 1.0,
+          ease: "power2.out",
+          onUpdate: function () {
+            el.textContent = "€" + group(Math.round(box.v));
+          },
+        });
+      }
+
+      // Scene 1 (0.0-1.2s) — eyebrow, then the first headline line. Hero is
+      // legible well before 0.5s; reveals resolve in place, never slide.
+      tl.fromTo(
+        "#f01-gap-eyebrow",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: ENTRY },
+        0.0
+      );
+      tl.fromTo(
+        "#f01-gap-head-a",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        0.12
+      );
+
+      // Scene 2 (1.2-2.4s) — the reported figure counts up once.
+      tl.fromTo(
+        "#f01-gap-card-a",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.45, ease: ENTRY },
+        1.15
+      );
+      tl.add(euro(document.getElementById("f01-gap-value-a"), 1840000), 1.35);
+
+      // Scene 3 (2.4-3.4s) — the second line lands, and with it the figure
+      // that actually matters. Same size, same tabular column: the digit
+      // count is the argument, not a size trick.
+      tl.fromTo(
+        "#f01-gap-head-b",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        2.35
+      );
+      tl.fromTo(
+        "#f01-gap-card-b",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.45, ease: ENTRY },
+        2.55
+      );
+      tl.add(euro(document.getElementById("f01-gap-value-b"), 312000), 2.75);
+
+      // Scene 4 (3.4-5.0s) — the rule draws between claim and evidence, then
+      // the frame holds. No exit: the root transition owns that.
+      tl.fromTo(
+        "#f01-gap-rule",
+        { scaleX: 0, opacity: 1 },
+        { scaleX: 1, duration: 0.85, ease: "power3.inOut" },
+        3.45
+      );
+
+      window.__timelines["01-gap"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,259 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Inter";
+      src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .cl-ground {
+      position: absolute;
+      inset: 0;
+      background: #fbfaf8;
+    }
+
+    .cl-chips {
+      position: absolute;
+      left: 0;
+      top: 318px;
+      width: 1920px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .cl-chip {
+      padding: 12px 26px;
+      border-radius: 100px;
+      border: 1.5px solid rgba(149, 88, 35, 0.28);
+      background: rgba(149, 88, 35, 0.06);
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #8a5220;
+    }
+
+    .cl-head {
+      position: absolute;
+      left: 0;
+      top: 386px;
+      width: 1920px;
+      text-align: center;
+      font-size: 104px;
+      font-weight: 600;
+      line-height: 0.98;
+      letter-spacing: -0.035em;
+      color: #231f1a;
+    }
+
+    .cl-sub {
+      position: absolute;
+      left: 460px;
+      top: 616px;
+      width: 1000px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #6f675f;
+    }
+
+    .cl-foot {
+      position: absolute;
+      left: 0;
+      top: 738px;
+      width: 1920px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .cl-mark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #231f1a;
+    }
+
+    .cl-cta {
+      padding: 20px 46px;
+      border-radius: 100px;
+      background: #955823;
+      color: #fbfaf8;
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="06-close"
+    data-start="0"
+    data-duration="4.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      class="clip cl-ground"
+      id="f06-close-cl-ground"
+      data-start="0"
+      data-duration="4.5"
+      data-track-index="0"
+    ></div>
+
+    <div
+      class="clip cl-chips"
+      id="f06-close-cl-chips"
+      data-start="0"
+      data-duration="4.5"
+      data-track-index="1"
+    >
+      <div class="cl-chip" id="f06-close-c0">One view</div>
+      <div class="cl-chip" id="f06-close-c1">Margin</div>
+      <div class="cl-chip" id="f06-close-c2">Cash</div>
+      <div class="cl-chip" id="f06-close-c3">Signals</div>
+    </div>
+
+    <div
+      class="clip cl-head"
+      id="f06-close-head"
+      data-start="0"
+      data-duration="4.5"
+      data-track-index="2"
+    >
+      Find out what you<br />actually made.
+    </div>
+
+    <div
+      class="clip cl-sub"
+      id="f06-close-sub"
+      data-start="0"
+      data-duration="4.5"
+      data-track-index="3"
+    >
+      Connect a source and ProfitMe returns your real contribution margin in
+      under two minutes.
+    </div>
+
+    <div
+      class="clip cl-foot"
+      id="f06-close-foot"
+      data-start="0"
+      data-duration="4.5"
+      data-track-index="4"
+    >
+      <div class="cl-mark">
+        <svg width="42" height="42" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M4 18V9.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V18"
+            fill="none"
+            stroke="#231f1a"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M15 18V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v12"
+            fill="none"
+            stroke="#955823"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M2 21h20"
+            fill="none"
+            stroke="#231f1a"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        <span>ProfitMe</span>
+      </div>
+      <div class="cl-cta">Start free</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var ENTRY = "power3.out";
+      var EXIT = "power2.in";
+
+      // Scene 1 (0.0-1.0s) — the four blind spots return as chips, the only
+      // place the film looks back, then clear the stage for the close.
+      ["#f06-close-c0", "#f06-close-c1", "#f06-close-c2", "#f06-close-c3"].forEach(
+        function (c, i) {
+          tl.fromTo(
+            c,
+            { opacity: 0 },
+            { opacity: 1, duration: 0.3, ease: ENTRY },
+            0.0 + i * 0.06
+          );
+        }
+      );
+      tl.to(
+        ["#f06-close-c0", "#f06-close-c1", "#f06-close-c2", "#f06-close-c3"],
+        { opacity: 0, duration: 0.4, ease: EXIT, stagger: 0.04 },
+        0.95
+      );
+
+      // Scene 2 (1.0-2.2s) — the page's own closing line, entering as the
+      // chips leave. Overlapping, never sequential out-then-in.
+      tl.fromTo(
+        "#f06-close-head",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, ease: ENTRY },
+        1.05
+      );
+      tl.fromTo(
+        "#f06-close-sub",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        1.5
+      );
+
+      // Scene 3 (2.2-3.0s) — mark and the single solid CTA.
+      tl.fromTo(
+        "#f06-close-foot",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, ease: ENTRY },
+        2.25
+      );
+
+      // Scene 4 (3.0-4.5s) — held stillness. Nothing moves after this: the
+      // film ends on a beat of quiet rather than on a cut.
+      window.__timelines["06-close"] = tl;
+    })();
+  </script>
+</template>
