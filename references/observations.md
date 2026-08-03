@@ -316,3 +316,50 @@ lime for the same "if everyone converges here it isn't synthesis" logic that
 disqualified blue, glitch-red as tonally wrong for a profit/loss tool where red
 already carries a specific, serious meaning. Neither changes the copper
 decision; both make it slightly better-evidenced.
+
+---
+
+## 2026-08-03 — dashboard reveal pass (re-read for a Trigger B redesign)
+
+Re-listed `references/` (26 assets) and re-read the ones this task actually
+turns on, in full: all four `dashboards/` stills plus the Verdikt flow video,
+`concepts/dribbble-logistics-dashboard-perspective.png`, and frame extractions
+from `spline/`, `tesla/` and `apple/`. The six `animations/` clips were read in
+depth earlier the same day (see the 2026-08-02 entry) and are not re-derived
+here. `audi/`, `rimac/`, `mercedes/` and the remaining `concepts/` stills were
+not re-opened this pass — their findings are already in the entries above and
+nothing in this task depended on re-confirming them.
+
+**The find of the pass: `verdikt-dashboard-desktop-midload.png` is a genuine
+partially-loaded frame, and what is missing from it is systematic.** Chrome,
+eyebrows, panel titles, every KPI number, and the ring gauge's drawn arc are
+all painted. The area chart is entirely absent, every progress bar is an empty
+track, the distribution bar and its headline percentage are absent, and the
+activity list is absent. Comparing it against `-settled.png` gives an assembly
+order rather than a guess: shell → labels → headline numbers → charts, bars and
+rows last. Folded into `design-system.md` (Motion, principle 8) as a table,
+because it is the kind of thing that would otherwise be re-invented as "fade
+the panel in" on every future reveal.
+
+**Second find: the loading state is labelled with a domain verb.** The Verdikt
+flow video holds on a partial arc reading "Synthesizing…" — not a spinner, not
+"Loading". Added to Component conventions. For an analytics product the count
+of what is being processed is itself a piece of information, so the hold can
+carry real content.
+
+**Perspective is reference-backed; hardware is not.** The logistics concept
+tilts dashboard panels in 3D with soft grounding shadows and one panel lifted
+forward, which supports a perspective treatment. But **no asset in the library
+contains a laptop, a phone frame, or any device chrome at all** — Verdikt is a
+flat screenshot, the concept work is bare floating panels. The laptop built
+this pass came from an explicit product instruction, not from the references,
+and it is deliberately abstract (a bezel, a deck, a trackpad rectangle) rather
+than a rendered machine. Flagged because a photoreal laptop reveal is Apple's
+signature move and `apple/` is in this library; going near it would be the
+copy the originality rules exist to prevent. The dashboard is the subject, the
+hardware is a stage.
+
+**Not adopted:** Verdikt's blue accent and its glowing blue ring gauge (the
+copper decision stands, and this is the third pass that has had to say so);
+the Spline gallery's card-grid hero; Tesla's full-bleed product photography,
+which has nothing to give a product with no physical object to photograph.

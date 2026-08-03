@@ -1680,9 +1680,435 @@ svg {
 }
 
 /* ----------------------------------------------------------------------------
-   Pinned stage
-   The stage needs room to be held against while its timeline plays out.
+   04b — The reveal rig: laptop + assistant drawer
+   ---------------------------------------------------------------------------
+   The screen is laid out at a FIXED design size (1000x625) and then scaled to
+   fit by JS, exactly like a real device mock. Trying to make a dashboard this
+   dense reflow gracefully inside a rotating 3D box means its internal rhythm
+   changes at every width; scaling one fixed composition keeps the spacing
+   scale intact at any viewport and keeps the 3D maths simple, since the lid's
+   dimensions never change.
    -------------------------------------------------------------------------- */
+
+/* During the pin the section IS the viewport, so the head is lifted out of
+   flow and the rig gets the whole centred stage. Left in normal flow the
+   head's ~300px would push the laptop past the fold, which is exactly what
+   the first render of this section did. */
+@media (min-width: 900px) {
+  .reveal-stage {
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    padding-block: 0;
+  }
+
+  .reveal-stage__head {
+    position: absolute;
+    inset-inline: 0;
+    top: calc(64px + var(--space-2xl));
+    margin: 0 auto;
+    z-index: 2;
+  }
+}
+
+.rig {
+  /* The camera. Deep enough that the lid's rotation reads as a hinge rather
+     than a fisheye. */
+  perspective: 2200px;
+  perspective-origin: 50% 42%;
+  display: flex;
+  justify-content: center;
+}
+
+.rig__scale {
+  transform: scale(var(--rig-scale, 1));
+  transform-origin: 50% 0%;
+  /* Reserves the post-scale height so the pinned section doesn't jump when
+     the scale factor changes on resize. JS writes this. */
+  height: var(--rig-height, auto);
+}
+
+.laptop {
+  position: relative;
+  width: 1000px;
+  transform-style: preserve-3d;
+  /* Camera tilt is owned by GSAP (rotateX), not by a CSS custom property.
+     Custom properties are strings to the compositor and cannot be
+     interpolated as transforms without registerProperty — the timeline
+     animates real transform channels instead. */
+}
+
+.laptop__lid {
+  position: relative;
+  width: 1000px;
+  height: 625px;
+  transform-style: preserve-3d;
+  /* Hinges on its bottom edge. GSAP drives rotateX from shut to upright. */
+  transform-origin: 50% 100%;
+  will-change: transform;
+  border-radius: 14px;
+  padding: 12px;
+  background: linear-gradient(
+    170deg,
+    hsl(30 6% 26%),
+    hsl(30 7% 14%)
+  );
+  box-shadow: 0 40px 90px hsl(30 20% 4% / 0.55);
+}
+
+/* The screen's emitted light. A separate always-present layer whose opacity
+   the timeline raises — animating a box-shadow directly would re-rasterise
+   the largest element on the page every frame. */
+.laptop__lit {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow: 0 0 90px 24px hsl(28 58% 45% / 0.3);
+  opacity: 0;
+}
+
+[data-theme="light"] .laptop__lid {
+  background: linear-gradient(170deg, hsl(30 12% 84%), hsl(30 10% 70%));
+  box-shadow: 0 40px 90px hsl(30 15% 30% / 0.28);
+}
+
+.laptop__screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-page);
+}
+
+/* A single soft sheen across the panel, so the glass reads as glass when the
+   lid is mid-rotation. Static gradient — no filter, nothing per-frame. */
+.laptop__glare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    104deg,
+    hsl(0 0% 100% / 0.09) 0%,
+    hsl(0 0% 100% / 0.02) 26%,
+    transparent 46%
+  );
+}
+
+/* Deck — anchored at the hinge, lying away from the viewer. */
+.laptop__deck {
+  position: absolute;
+  inset-inline: 0;
+  top: 625px;
+  height: 440px;
+  transform-origin: 50% 0%;
+  transform: rotateX(-90deg);
+  border-radius: 0 0 18px 18px;
+  /* Darkest at the far edge so the plane reads as receding under its own
+     shading rather than relying on the perspective alone. */
+  background: linear-gradient(
+    180deg,
+    hsl(30 6% 20%),
+    hsl(30 8% 9%)
+  );
+}
+
+[data-theme="light"] .laptop__deck {
+  background: linear-gradient(180deg, hsl(30 8% 72%), hsl(30 8% 52%));
+}
+
+.laptop__hinge {
+  position: absolute;
+  inset-inline: 12%;
+  top: 0;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: hsl(30 8% 8% / 0.6);
+}
+
+.laptop__pad {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 300px;
+  height: 180px;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  background: hsl(0 0% 100% / 0.04);
+  box-shadow: inset 0 0 0 1px hsl(0 0% 100% / 0.05);
+}
+
+[data-theme="light"] .laptop__pad {
+  background: hsl(30 10% 55% / 0.18);
+  box-shadow: inset 0 0 0 1px hsl(30 10% 40% / 0.12);
+}
+
+/* --- Dashboard inside the screen -------------------------------------- */
+
+/* Everything below is scoped to the widths where the laptop actually exists.
+   Left unscoped, the three-column screen layout leaked onto phones and
+   squeezed the panels into unreadable slivers — the fixed-size screen and
+   its density are a desktop-only construct. */
+@media (min-width: 900px) {
+  .laptop__screen .dash {
+    height: 100%;
+    border-radius: 0;
+    position: relative;
+    /* Header, KPIs, then the panel row takes whatever is left. */
+    grid-template-rows: auto auto 1fr;
+    /* The screen is a fixed 976x601 box, so the dashboard has to fit it
+       exactly rather than growing and being clipped — which is what the
+       first render of this did to the fourth breakdown row. Density tightens
+       a step inside the device: "density is a deliberate choice per surface",
+       and this surface is a 13-inch screen rendered at ~83%. */
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  /* The assistant gets a reserved column rather than floating over the data.
+     An overlay covered the breakdown panel's own rows — an assistant that
+     obscures the numbers it is describing is a worse product than one that
+     sits beside them, and reserving the column also means nothing reflows at
+     the moment it arrives. */
+  .laptop__screen .dash__panels {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.05fr);
+    min-height: 0;
+  }
+
+  .laptop__screen .panel {
+    padding: var(--space-md);
+    min-height: 0;
+  }
+
+  .laptop__screen .panel__head {
+    margin-bottom: var(--space-md);
+  }
+
+  .laptop__screen .kpi {
+    padding: var(--space-md);
+  }
+
+  .laptop__screen .mrow {
+    padding-block: 5px;
+  }
+
+  .laptop__screen .chart {
+    min-height: 0;
+  }
+
+  .laptop__screen .ai {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+}
+
+/* --- Assistant drawer -------------------------------------------------- */
+
+.ai {
+  border-radius: var(--radius-md);
+  border: var(--elevation-1-border);
+  /* Opaque. This element is translated on a scrub — see the note on .frame
+     and scroll.js's performance contract. */
+  background: var(--surface-float);
+  padding: var(--space-lg);
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+  min-width: 0;
+}
+
+.ai__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.ai__spark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-tint);
+  color: var(--accent);
+  flex: none;
+}
+
+.ai__title {
+  font-size: var(--text-body-size);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ai__status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.ai__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--positive);
+}
+
+.ai__thread {
+  display: grid;
+  gap: var(--space-sm);
+  justify-items: start;
+}
+
+.ai__msg {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  line-height: 1.45;
+  max-width: 96%;
+}
+
+.ai__msg--user {
+  justify-self: end;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-end-end-radius: var(--radius-sm);
+}
+
+.ai__msg--bot {
+  background: var(--bg-well);
+  border: 1px solid var(--border-soft);
+  border-end-start-radius: var(--radius-sm);
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.ai__msg--bot p {
+  margin: 0;
+}
+
+.ai__msg--bot strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ai__figure {
+  font-weight: 600;
+  color: var(--negative);
+}
+
+.ai__cite {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* The hold. A partial arc plus a domain verb — the loading treatment the
+   dashboards/ reference uses, which names what it is doing rather than
+   showing an unlabelled spinner. */
+.ai__thinking {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--bg-well);
+  border: 1px solid var(--border-soft);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.ai__arc {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--accent-tint);
+  border-top-color: var(--accent);
+  animation: ai-arc 900ms linear infinite;
+}
+
+@keyframes ai-arc {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai__arc {
+    animation: none;
+  }
+}
+
+/* --- Narrow screens: no rig, no 3D ------------------------------------- */
+/* Below the pin threshold the laptop is dropped entirely and the dashboard
+   goes back to being a plain framed panel. A 1000px-wide fixed composition
+   scaled to phone width would render 9px type; the honest answer at that
+   size is to stop pretending it is a device and just show the screen. */
+
+@media (max-width: 899px) {
+  .rig {
+    perspective: none;
+  }
+
+  .rig__scale {
+    transform: none;
+    height: auto;
+    width: 100%;
+  }
+
+  .laptop {
+    width: 100%;
+    transform: none;
+  }
+
+  .laptop__deck {
+    display: none;
+  }
+
+  .laptop__lid {
+    width: 100%;
+    height: auto;
+    transform: none;
+    padding: var(--space-sm);
+    border-radius: var(--radius-lg);
+    background: var(--surface-float);
+    border: 1px solid var(--glass-card-edge);
+    box-shadow: var(--elevation-2);
+  }
+
+  .laptop__screen {
+    height: auto;
+    border-radius: var(--radius-md);
+    box-shadow: none;
+  }
+
+  .laptop__glare {
+    display: none;
+  }
+
+  .laptop__screen .dash {
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+
+  .ai {
+    position: static;
+    width: auto;
+    box-shadow: none;
+    margin-top: var(--space-lg);
+  }
+}
 
 [data-pin-frame] {
   transform-style: preserve-3d;
@@ -2071,6 +2497,12 @@ svg {
       <!-- =================================================================
            04 — PRODUCT REVEAL
            =================================================================== -->
+      <!-- Cinematic reveal. Every beat below is a position on ONE scrubbed
+           timeline (see scroll.js § 5) rather than an independent trigger, so
+           the whole sequence is driven by scroll position and nothing can
+           appear instantly. Beat order — chrome and headline numbers first,
+           charts and rows last — is taken from the mid-load capture in
+           references/dashboards/, which shows exactly that ordering. -->
       <section class="reveal-stage" id="product" data-pin-stage>
         <div class="container">
           <div class="reveal-stage__head" data-pin-head>
@@ -2081,130 +2513,196 @@ svg {
             </p>
           </div>
 
-          <div class="frame" data-pin-frame data-grow-scope data-draw-scope>
-            <div class="frame__bar" aria-hidden="true">
-              <span class="frame__dot"></span>
-              <span class="frame__dot"></span>
-              <span class="frame__dot"></span>
-              <span class="frame__title">ProfitMe — Overview</span>
-            </div>
-
-            <div class="dash">
-              <div class="dash__top">
-                <div>
-                  <p class="panel__eyebrow">Command view</p>
-                  <p class="t-h3">October margin</p>
-                </div>
-                <span class="sample-note">
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M8 7.2v4M8 5.2v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                  </svg>
-                  Sample data — connect a source to make it yours
-                </span>
-              </div>
-
-              <div class="dash__kpis">
-                <div class="kpi">
-                  <p class="kpi__label">Revenue</p>
-                  <p class="kpi__value num">€184,200</p>
-                  <p class="kpi__delta kpi__delta--up num">▲ 18.2% vs Sep</p>
-                </div>
-                <div class="kpi">
-                  <p class="kpi__label">Gross margin</p>
-                  <p class="kpi__value num">42.8%</p>
-                  <p class="kpi__delta kpi__delta--up num">▲ 3.1 pts</p>
-                </div>
-                <div class="kpi">
-                  <p class="kpi__label">Contribution</p>
-                  <p class="kpi__value num">€31,240</p>
-                  <p class="kpi__delta kpi__delta--down num">▼ 4.0% vs Sep</p>
-                </div>
-                <div class="kpi">
-                  <p class="kpi__label">Cash gap</p>
-                  <p class="kpi__value num">38 days</p>
-                  <p class="kpi__delta kpi__delta--down num">▼ 6 days worse</p>
-                </div>
-              </div>
-
-              <div class="dash__panels">
-                <div class="panel panel--chart">
-                  <div class="panel__head">
-                    <div>
-                      <p class="panel__eyebrow">Trend</p>
-                      <p class="panel__title">Contribution margin, 12 months</p>
-                    </div>
-                    <span class="pill pill--positive">Improving</span>
-                  </div>
-                  <svg class="chart" viewBox="0 0 420 132" preserveAspectRatio="none" aria-hidden="true">
-                    <defs>
-                      <linearGradient id="pmGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28" />
-                        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      class="chart__area"
-                      d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28 L418 132 L0 132 Z"
-                    />
-                    <path
-                      class="chart__line"
-                      data-draw
-                      d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28"
-                    />
-                    <circle class="chart__dot" cx="418" cy="28" r="4" data-draw-dot />
-                  </svg>
+          <div class="rig" data-rig>
+            <div class="rig__scale" data-rig-scale>
+              <div class="laptop" data-laptop>
+                <!-- Deck: the receding keyboard plane. Pure stage, not a
+                     product rendering — the reference set contains no laptop
+                     at all, so the hardware stays abstract and the dashboard
+                     is the subject. -->
+                <div class="laptop__deck" aria-hidden="true">
+                  <span class="laptop__hinge"></span>
+                  <span class="laptop__pad"></span>
                 </div>
 
-                <div class="panel">
-                  <div class="panel__head">
-                    <div>
-                      <p class="panel__eyebrow">Breakdown</p>
-                      <p class="panel__title">Margin by product</p>
-                    </div>
-                  </div>
+                <div class="laptop__lid" data-laptop-lid>
+                  <div class="laptop__lit" data-laptop-lit aria-hidden="true"></div>
+                  <div class="laptop__screen">
+                    <div class="laptop__glare" data-laptop-glare aria-hidden="true"></div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Atlas Pro</div>
-                      <div class="mrow__sub">1,204 units</div>
-                    </div>
-                    <div class="mrow__val num">61%</div>
-                    <div class="mrow__bar">
-                      <span class="is-pos" data-grow="61%"></span>
-                    </div>
-                  </div>
+                    <div class="dash" data-dash>
+                      <div class="dash__top" data-rig-chrome>
+                        <div>
+                          <p class="panel__eyebrow">Command view</p>
+                          <p class="t-h3">October margin</p>
+                        </div>
+                        <span class="sample-note">
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M8 7.2v4M8 5.2v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                          </svg>
+                          Sample data — connect a source to make it yours
+                        </span>
+                      </div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Atlas Core</div>
-                      <div class="mrow__sub">3,880 units</div>
-                    </div>
-                    <div class="mrow__val num">38%</div>
-                    <div class="mrow__bar">
-                      <span class="is-pos" data-grow="38%"></span>
-                    </div>
-                  </div>
+                      <div class="dash__kpis">
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Revenue</p>
+                          <p class="kpi__value num"><span data-rig-count="184200" data-prefix="€">€0</span></p>
+                          <p class="kpi__delta kpi__delta--up num">▲ 18.2% vs Sep</p>
+                        </div>
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Gross margin</p>
+                          <p class="kpi__value num"><span data-rig-count="42.8" data-decimals="1" data-suffix="%">0%</span></p>
+                          <p class="kpi__delta kpi__delta--up num">▲ 3.1 pts</p>
+                        </div>
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Contribution</p>
+                          <p class="kpi__value num"><span data-rig-count="31240" data-prefix="€">€0</span></p>
+                          <p class="kpi__delta kpi__delta--down num">▼ 4.0% vs Sep</p>
+                        </div>
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Cash gap</p>
+                          <p class="kpi__value num"><span data-rig-count="38" data-suffix=" days">0 days</span></p>
+                          <p class="kpi__delta kpi__delta--down num">▼ 6 days worse</p>
+                        </div>
+                      </div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Onboarding</div>
-                      <div class="mrow__sub">Services</div>
-                    </div>
-                    <div class="mrow__val num">12%</div>
-                    <div class="mrow__bar">
-                      <span class="is-cau" data-grow="12%"></span>
-                    </div>
-                  </div>
+                      <div class="dash__panels">
+                        <div class="panel panel--chart">
+                          <div class="panel__head">
+                            <div>
+                              <p class="panel__eyebrow">Trend</p>
+                              <p class="panel__title">Contribution margin, 12 months</p>
+                            </div>
+                            <span class="pill pill--positive">Improving</span>
+                          </div>
+                          <svg class="chart" viewBox="0 0 420 132" preserveAspectRatio="none" aria-hidden="true">
+                            <defs>
+                              <linearGradient id="pmGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28" />
+                                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+                              </linearGradient>
+                            </defs>
+                            <path
+                              class="chart__area"
+                              data-rig-area
+                              d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28 L418 132 L0 132 Z"
+                            />
+                            <path
+                              class="chart__line"
+                              data-rig-draw
+                              d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28"
+                            />
+                            <circle class="chart__dot" cx="418" cy="28" r="4" data-rig-dot />
+                          </svg>
+                        </div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Legacy plan</div>
-                      <div class="mrow__sub">412 accounts</div>
-                    </div>
-                    <div class="mrow__val num">−9%</div>
-                    <div class="mrow__bar">
-                      <span class="is-neg" data-grow="9%"></span>
+                        <div class="panel">
+                          <div class="panel__head">
+                            <div>
+                              <p class="panel__eyebrow">Breakdown</p>
+                              <p class="panel__title">Margin by product</p>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Atlas Pro</div>
+                              <div class="mrow__sub">1,204 units</div>
+                            </div>
+                            <div class="mrow__val num">61%</div>
+                            <div class="mrow__bar">
+                              <span class="is-pos" data-rig-grow="61%"></span>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Atlas Core</div>
+                              <div class="mrow__sub">3,880 units</div>
+                            </div>
+                            <div class="mrow__val num">38%</div>
+                            <div class="mrow__bar">
+                              <span class="is-pos" data-rig-grow="38%"></span>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Onboarding</div>
+                              <div class="mrow__sub">Services</div>
+                            </div>
+                            <div class="mrow__val num">12%</div>
+                            <div class="mrow__bar">
+                              <span class="is-cau" data-rig-grow="12%"></span>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Legacy plan</div>
+                              <div class="mrow__sub">412 accounts</div>
+                            </div>
+                            <div class="mrow__val num">−9%</div>
+                            <div class="mrow__bar">
+                              <span class="is-neg" data-rig-grow="9%"></span>
+                            </div>
+                          </div>
+                        </div>
+
+                      <!-- Assistant — the last beat. It gets its own reserved
+                           column rather than floating over the panels: an
+                           assistant that covers the numbers it is describing
+                           is worse than one sitting beside them, and a
+                           reserved column means nothing reflows when it
+                           arrives. Opaque, not backdrop-filtered — it is
+                           transformed on a scrub, and sampling a backdrop
+                           every frame there is the rule this project already
+                           fixed once. -->
+                      <aside class="ai" data-ai aria-label="ProfitMe assistant">
+                        <div class="ai__head">
+                          <span class="ai__spark" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M8 1.5l1.5 4.2 4.2 1.5-4.2 1.5L8 12.9 6.5 8.7 2.3 7.2l4.2-1.5L8 1.5Z" fill="currentColor"/>
+                            </svg>
+                          </span>
+                          <span class="ai__title">Ask ProfitMe</span>
+                          <span class="ai__status">
+                            <span class="ai__dot" aria-hidden="true"></span>Connected
+                          </span>
+                        </div>
+
+                        <div class="ai__thread">
+                          <p class="ai__msg ai__msg--user" data-ai-user>
+                            Why did contribution drop in October?
+                          </p>
+
+                          <!-- Designed hold, not an accidental blank. Domain
+                               verb over a generic spinner — the pattern in
+                               references/dashboards/ (a labelled arc reading
+                               "Synthesizing…", never "Loading"). -->
+                          <p class="ai__thinking" data-ai-thinking>
+                            <span class="ai__arc" aria-hidden="true"></span>
+                            Reading 4,812 transactions…
+                          </p>
+
+                          <div class="ai__msg ai__msg--bot" data-ai-answer>
+                            <p>
+                              <strong>Legacy plan</strong> turned negative. 412
+                              accounts at −9% margin cost you
+                              <span class="ai__figure num">€18,400</span> this month.
+                            </p>
+                            <span class="ai__cite">
+                              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              Traced to 412 source rows
+                            </span>
+                          </div>
+                        </div>
+                      </aside>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2918,47 +3416,202 @@ svg {
       });
     });
 
-    /* --- 5. Sticky product reveal -------------------------------------- */
-    /* The page's one pinned moment. The dashboard is held while it rotates
-       up out of perspective and scales into place, scrubbed to scroll so the
-       user is driving it frame by frame.
+    /* --- 5. Cinematic product reveal ------------------------------------ */
+    /* The page's one pinned moment, and the only place a full sequence plays.
+       Everything below is a POSITION ON ONE TIMELINE rather than a set of
+       independent triggers — that is what makes it genuinely scroll-driven:
+       scrub a single timeline and every beat is a function of scroll offset,
+       so nothing can pop in on its own clock and scrubbing backwards runs the
+       whole sequence in reverse.
 
-       No blur on this timeline: the frame is the largest element on the page,
-       and blurring it while scrubbing is exactly the thing that would cost
-       the frame budget. Depth is carried by rotateX and scale instead. */
+       Beat order is not invented. The mid-load capture in
+       references/dashboards/ shows a real dashboard part-way through loading:
+       chrome, labels and headline numbers are already painted, while the area
+       chart, the progress bars and the activity list are still absent. So:
+       shell first, numbers second, charts and rows last, assistant last of
+       all. That is also the design system's "a dashboard assembles rather
+       than switching on", with the ordering filled in from evidence.
+
+       PERFORMANCE
+       The lid carries the entire dashboard subtree and rotates for the whole
+       scrub, so nothing inside it may animate a filter, and nothing inside it
+       samples a backdrop. Beats are transform/opacity, plus two SVG geometry
+       properties (strokeDashoffset, width) that are cheap on elements this
+       small. */
     var stage = document.querySelector("[data-pin-stage]");
-    var frame = document.querySelector("[data-pin-frame]");
     var stageHead = document.querySelector("[data-pin-head]");
+    var rig = document.querySelector("[data-rig]");
+    var rigScale = document.querySelector("[data-rig-scale]");
+    var laptop = document.querySelector("[data-laptop]");
+    var lid = document.querySelector("[data-laptop-lid]");
 
-    if (stage && frame && window.innerWidth >= 900) {
-      gsap.set(frame, { transformPerspective: 1400, transformOrigin: "50% 100%" });
+    var LID_W = 1000;
+    var LID_H = 625;
 
-      var pinTl = gsap.timeline({
+    /* The rig is laid out at a fixed design size, then scaled to the space
+       actually available — width-bound on narrow desktops, height-bound on
+       short ones, whichever bites first, so the laptop is never taller than
+       the viewport it is pinned inside. */
+    function fitRig() {
+      if (!rig || !rigScale || window.innerWidth < 900) return;
+      var byWidth = rig.clientWidth / LID_W;
+      /* The lid is not the only thing on the pinned stage — the head sits
+         above it and the deck reads below it — so the height budget is well
+         under the full viewport. 0.58 keeps the whole machine, including the
+         open-lid silhouette, inside a 900px-tall window. */
+      var byHeight = (window.innerHeight * 0.58) / LID_H;
+      var s = Math.min(byWidth, byHeight, 1);
+      rigScale.style.setProperty("--rig-scale", s.toFixed(4));
+      rigScale.style.setProperty("--rig-height", Math.round(LID_H * s) + "px");
+    }
+
+    if (stage && laptop && lid && window.innerWidth >= 900) {
+      fitRig();
+      window.addEventListener(
+        "resize",
+        function () {
+          fitRig();
+        },
+        { passive: true }
+      );
+
+      var kpis = stage.querySelectorAll("[data-rig-kpi]");
+      var rows = stage.querySelectorAll("[data-rig-row]");
+      var chrome = stage.querySelector("[data-rig-chrome]");
+      var area = stage.querySelector("[data-rig-area]");
+      var line = stage.querySelector("[data-rig-draw]");
+      var dot = stage.querySelector("[data-rig-dot]");
+      var ai = stage.querySelector("[data-ai]");
+      var aiUser = stage.querySelector("[data-ai-user]");
+      var aiThinking = stage.querySelector("[data-ai-thinking]");
+      var aiAnswer = stage.querySelector("[data-ai-answer]");
+
+      var lit = stage.querySelector("[data-laptop-lit]");
+      var glare = stage.querySelector("[data-laptop-glare]");
+
+      /* Resting states — everything absent, lid shut, screen dark. */
+      gsap.set(laptop, { rotateX: 18 });
+      gsap.set(lid, { rotateX: -90 });
+      gsap.set(lit, { opacity: 0 });
+      gsap.set(glare, { opacity: 1 });
+      gsap.set(chrome, { opacity: 0, y: 10 });
+      gsap.set(kpis, { opacity: 0, y: 14 });
+      gsap.set(".dash__panels", { opacity: 0 });
+      gsap.set(rows, { opacity: 0, x: -8 });
+      gsap.set(area, { opacity: 0 });
+      gsap.set(dot, { scale: 0, transformOrigin: "50% 50%" });
+      gsap.set(ai, { opacity: 0, y: 34 });
+      gsap.set([aiUser, aiThinking, aiAnswer], { opacity: 0, y: 8 });
+
+      var lineLen = line && line.getTotalLength ? line.getTotalLength() : 900;
+      gsap.set(line, { strokeDasharray: lineLen, strokeDashoffset: lineLen });
+
+      stage.querySelectorAll("[data-rig-grow]").forEach(function (el) {
+        gsap.set(el, { width: "0%" });
+      });
+
+      var tl = gsap.timeline({
+        defaults: { ease: "none" },
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: "+=90%",
+          /* Long enough that six beats each get real scroll distance. Too
+             short and the sequence reads as one blurred event. */
+          end: "+=260%",
           pin: true,
-          scrub: 0.6,
-          anticipatePin: 1
+          scrub: 0.7,
+          anticipatePin: 1,
+          invalidateOnRefresh: true
         }
       });
 
-      pinTl
-        .fromTo(
-          frame,
-          { scale: 0.84, rotateX: 15, y: 70, opacity: 0.55 },
-          { scale: 1, rotateX: 0, y: 0, opacity: 1, ease: "none" },
-          0
+      /* Beat 1 — the machine turns to face you and opens. */
+      /* The head clears out completely rather than lingering at low opacity:
+         it is positioned over the stage, so any residue sits on top of the
+         screen once the lid is upright. */
+      tl.to(stageHead, { y: -60, opacity: 0, duration: 0.13 }, 0)
+        .to(laptop, { rotateX: 3, duration: 0.34 }, 0)
+        .to(lid, { rotateX: 0, duration: 0.3 }, 0.02)
+
+        /* Beat 2 — the panel lights before anything is drawn on it. */
+        .to(lit, { opacity: 1, duration: 0.14 }, 0.16)
+        .to(glare, { opacity: 0.3, duration: 0.14 }, 0.16)
+
+        /* Beat 3 — chrome and labels, the first thing painted in the
+           reference's mid-load frame. */
+        .to(chrome, { opacity: 1, y: 0, duration: 0.08 }, 0.24)
+
+        /* Beat 4 — KPI tiles cascade, numbers running as they arrive. */
+        .to(
+          kpis,
+          { opacity: 1, y: 0, duration: 0.1, stagger: 0.035 },
+          0.3
         )
-        .fromTo(
-          stageHead,
-          { y: 0, opacity: 1 },
-          { y: -70, opacity: 0.25, ease: "none" },
-          0
+
+        /* Beat 5 — charts and rows, last to resolve. The line draws under
+           the user's own scroll rather than on a timer. */
+        .to(".dash__panels", { opacity: 1, duration: 0.06 }, 0.42)
+        .to(line, { strokeDashoffset: 0, duration: 0.22 }, 0.44)
+        .to(area, { opacity: 1, duration: 0.16 }, 0.5)
+        .to(dot, { scale: 1, duration: 0.05, ease: "back.out(2)" }, 0.65)
+        .to(rows, { opacity: 1, x: 0, duration: 0.08, stagger: 0.03 }, 0.46)
+
+        /* Beat 6 — the assistant arrives, asks, thinks, answers. The hold is
+           a designed state, and it crossfades out under the answer rather
+           than clearing first. */
+        .to(ai, { opacity: 1, y: 0, duration: 0.1 }, 0.6)
+        .to(aiUser, { opacity: 1, y: 0, duration: 0.05 }, 0.67)
+        .to(aiThinking, { opacity: 1, y: 0, duration: 0.04 }, 0.73)
+        /* Overlapping crossfade — the hold is still fading as the answer
+           arrives, never a blank gap between the two. */
+        .to(aiThinking, { opacity: 0, duration: 0.05 }, 0.82)
+        .to(aiAnswer, { opacity: 1, y: 0, duration: 0.06 }, 0.81);
+      /* 0.87 → 1.00 is deliberate hold: the finished screen sits still for a
+         beat before the pin releases, so the sequence has an ending rather
+         than just stopping. */
+
+      /* Counters ride the same timeline, so the numbers are literally a
+         function of scroll position. */
+      stage.querySelectorAll("[data-rig-count]").forEach(function (el, i) {
+        var target = parseFloat(el.getAttribute("data-rig-count"));
+        var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+        var prefix = el.getAttribute("data-prefix") || "";
+        var suffix = el.getAttribute("data-suffix") || "";
+        var obj = { v: 0 };
+        tl.to(
+          obj,
+          {
+            v: target,
+            duration: 0.16,
+            onUpdate: function () {
+              el.textContent =
+                prefix +
+                obj.v.toLocaleString(undefined, {
+                  minimumFractionDigits: decimals,
+                  maximumFractionDigits: decimals
+                }) +
+                suffix;
+            }
+          },
+          0.32 + i * 0.035
         );
-    } else if (frame) {
-      gsap.set(frame, { opacity: 1 });
+      });
+
+      /* Bars grow in the same late window as the chart. */
+      stage.querySelectorAll("[data-rig-grow]").forEach(function (el, i) {
+        tl.to(
+          el,
+          { width: el.getAttribute("data-rig-grow"), duration: 0.14 },
+          0.48 + i * 0.03
+        );
+      });
+
+      window.addEventListener("load", fitRig);
+    } else {
+      /* Narrow screens: no pin, no laptop, no sequence. The dashboard is a
+         plain panel and its contents reveal with the same patterns the rest
+         of the page uses, so nothing is stuck invisible. */
+      restRig(true);
     }
 
     /* --- 6. Parallax + depth ------------------------------------------- */
@@ -3161,8 +3814,129 @@ svg {
     return { words: words, ghosts: ghosts };
   }
 
+  /* The reveal rig outside its cinematic path.
+     `animate` true  → narrow screens: no pin and no laptop, but the contents
+                       still reveal on scroll like every other section.
+     `animate` false → reduced motion: everything already at its final value. */
+  function restRig(animate) {
+    var stage = document.querySelector("[data-pin-stage]");
+    if (!stage) return;
+
+    var statics = stage.querySelectorAll(
+      "[data-rig-chrome], [data-rig-kpi], [data-rig-row], [data-ai], [data-ai-user], [data-ai-answer], .dash__panels, [data-rig-area]"
+    );
+    statics.forEach(function (el) {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
+
+    /* The hold has nothing to hold for once the answer is already there. */
+    var thinking = stage.querySelector("[data-ai-thinking]");
+    if (thinking) thinking.style.display = "none";
+
+    var line = stage.querySelector("[data-rig-draw]");
+    var dot = stage.querySelector("[data-rig-dot]");
+    var bars = stage.querySelectorAll("[data-rig-grow]");
+    var counts = stage.querySelectorAll("[data-rig-count]");
+
+    function settle() {
+      if (line) {
+        line.style.strokeDasharray = "none";
+        line.style.strokeDashoffset = "0";
+      }
+      if (dot) dot.style.transform = "none";
+      bars.forEach(function (el) {
+        el.style.width = el.getAttribute("data-rig-grow");
+      });
+      counts.forEach(function (el) {
+        writeCount(el, parseFloat(el.getAttribute("data-rig-count")));
+      });
+    }
+
+    if (!animate || !window.gsap) {
+      settle();
+      return;
+    }
+
+    if (line) {
+      var len = line.getTotalLength ? line.getTotalLength() : 900;
+      gsap.set(line, { strokeDasharray: len, strokeDashoffset: len });
+      gsap.to(line, {
+        strokeDashoffset: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: line.closest(".panel--chart") || line,
+          start: "top 82%",
+          end: "bottom 60%",
+          scrub: 0.4
+        }
+      });
+    }
+
+    if (dot) {
+      gsap.fromTo(
+        dot,
+        { scale: 0, transformOrigin: "50% 50%" },
+        {
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(2)",
+          scrollTrigger: {
+            trigger: dot.closest(".panel--chart") || dot,
+            start: "bottom 68%",
+            once: true
+          }
+        }
+      );
+    }
+
+    bars.forEach(function (el) {
+      gsap.fromTo(
+        el,
+        { width: "0%" },
+        {
+          width: el.getAttribute("data-rig-grow"),
+          ease: "none",
+          scrollTrigger: {
+            trigger: el.closest(".panel") || el,
+            start: "top 85%",
+            end: "top 45%",
+            scrub: 0.5
+          }
+        }
+      );
+    });
+
+    counts.forEach(function (el) {
+      var obj = { v: 0 };
+      gsap.to(obj, {
+        v: parseFloat(el.getAttribute("data-rig-count")),
+        ease: "power3.out",
+        duration: 1.4,
+        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        onUpdate: function () {
+          writeCount(el, obj.v);
+        }
+      });
+    });
+  }
+
+  /* Shared number formatter — the counters in the rig and the ones elsewhere
+     on the page must format identically, so there is one implementation. */
+  function writeCount(el, value) {
+    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+    el.textContent =
+      (el.getAttribute("data-prefix") || "") +
+      value.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }) +
+      (el.getAttribute("data-suffix") || "");
+  }
+
   /* Everything at rest, for reduced-motion users. */
   function restAll() {
+    restRig(false);
     document
       .querySelectorAll(
         "[data-reveal-item], [data-card], [data-card-solo], [data-pin-frame], [data-hero-in], .sw"

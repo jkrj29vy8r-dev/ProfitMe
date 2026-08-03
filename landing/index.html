@@ -305,6 +305,12 @@
       <!-- =================================================================
            04 — PRODUCT REVEAL
            =================================================================== -->
+      <!-- Cinematic reveal. Every beat below is a position on ONE scrubbed
+           timeline (see scroll.js § 5) rather than an independent trigger, so
+           the whole sequence is driven by scroll position and nothing can
+           appear instantly. Beat order — chrome and headline numbers first,
+           charts and rows last — is taken from the mid-load capture in
+           references/dashboards/, which shows exactly that ordering. -->
       <section class="reveal-stage" id="product" data-pin-stage>
         <div class="container">
           <div class="reveal-stage__head" data-pin-head>
@@ -315,130 +321,196 @@
             </p>
           </div>
 
-          <div class="frame" data-pin-frame data-grow-scope data-draw-scope>
-            <div class="frame__bar" aria-hidden="true">
-              <span class="frame__dot"></span>
-              <span class="frame__dot"></span>
-              <span class="frame__dot"></span>
-              <span class="frame__title">ProfitMe — Overview</span>
-            </div>
-
-            <div class="dash">
-              <div class="dash__top">
-                <div>
-                  <p class="panel__eyebrow">Command view</p>
-                  <p class="t-h3">October margin</p>
-                </div>
-                <span class="sample-note">
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M8 7.2v4M8 5.2v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                  </svg>
-                  Sample data — connect a source to make it yours
-                </span>
-              </div>
-
-              <div class="dash__kpis">
-                <div class="kpi">
-                  <p class="kpi__label">Revenue</p>
-                  <p class="kpi__value num">€184,200</p>
-                  <p class="kpi__delta kpi__delta--up num">▲ 18.2% vs Sep</p>
-                </div>
-                <div class="kpi">
-                  <p class="kpi__label">Gross margin</p>
-                  <p class="kpi__value num">42.8%</p>
-                  <p class="kpi__delta kpi__delta--up num">▲ 3.1 pts</p>
-                </div>
-                <div class="kpi">
-                  <p class="kpi__label">Contribution</p>
-                  <p class="kpi__value num">€31,240</p>
-                  <p class="kpi__delta kpi__delta--down num">▼ 4.0% vs Sep</p>
-                </div>
-                <div class="kpi">
-                  <p class="kpi__label">Cash gap</p>
-                  <p class="kpi__value num">38 days</p>
-                  <p class="kpi__delta kpi__delta--down num">▼ 6 days worse</p>
-                </div>
-              </div>
-
-              <div class="dash__panels">
-                <div class="panel panel--chart">
-                  <div class="panel__head">
-                    <div>
-                      <p class="panel__eyebrow">Trend</p>
-                      <p class="panel__title">Contribution margin, 12 months</p>
-                    </div>
-                    <span class="pill pill--positive">Improving</span>
-                  </div>
-                  <svg class="chart" viewBox="0 0 420 132" preserveAspectRatio="none" aria-hidden="true">
-                    <defs>
-                      <linearGradient id="pmGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28" />
-                        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      class="chart__area"
-                      d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28 L418 132 L0 132 Z"
-                    />
-                    <path
-                      class="chart__line"
-                      data-draw
-                      d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28"
-                    />
-                    <circle class="chart__dot" cx="418" cy="28" r="4" data-draw-dot />
-                  </svg>
+          <div class="rig" data-rig>
+            <div class="rig__scale" data-rig-scale>
+              <div class="laptop" data-laptop>
+                <!-- Deck: the receding keyboard plane. Pure stage, not a
+                     product rendering — the reference set contains no laptop
+                     at all, so the hardware stays abstract and the dashboard
+                     is the subject. -->
+                <div class="laptop__deck" aria-hidden="true">
+                  <span class="laptop__hinge"></span>
+                  <span class="laptop__pad"></span>
                 </div>
 
-                <div class="panel">
-                  <div class="panel__head">
-                    <div>
-                      <p class="panel__eyebrow">Breakdown</p>
-                      <p class="panel__title">Margin by product</p>
-                    </div>
-                  </div>
+                <div class="laptop__lid" data-laptop-lid>
+                  <div class="laptop__lit" data-laptop-lit aria-hidden="true"></div>
+                  <div class="laptop__screen">
+                    <div class="laptop__glare" data-laptop-glare aria-hidden="true"></div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Atlas Pro</div>
-                      <div class="mrow__sub">1,204 units</div>
-                    </div>
-                    <div class="mrow__val num">61%</div>
-                    <div class="mrow__bar">
-                      <span class="is-pos" data-grow="61%"></span>
-                    </div>
-                  </div>
+                    <div class="dash" data-dash>
+                      <div class="dash__top" data-rig-chrome>
+                        <div>
+                          <p class="panel__eyebrow">Command view</p>
+                          <p class="t-h3">October margin</p>
+                        </div>
+                        <span class="sample-note">
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M8 7.2v4M8 5.2v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                          </svg>
+                          Sample data — connect a source to make it yours
+                        </span>
+                      </div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Atlas Core</div>
-                      <div class="mrow__sub">3,880 units</div>
-                    </div>
-                    <div class="mrow__val num">38%</div>
-                    <div class="mrow__bar">
-                      <span class="is-pos" data-grow="38%"></span>
-                    </div>
-                  </div>
+                      <div class="dash__kpis">
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Revenue</p>
+                          <p class="kpi__value num"><span data-rig-count="184200" data-prefix="€">€0</span></p>
+                          <p class="kpi__delta kpi__delta--up num">▲ 18.2% vs Sep</p>
+                        </div>
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Gross margin</p>
+                          <p class="kpi__value num"><span data-rig-count="42.8" data-decimals="1" data-suffix="%">0%</span></p>
+                          <p class="kpi__delta kpi__delta--up num">▲ 3.1 pts</p>
+                        </div>
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Contribution</p>
+                          <p class="kpi__value num"><span data-rig-count="31240" data-prefix="€">€0</span></p>
+                          <p class="kpi__delta kpi__delta--down num">▼ 4.0% vs Sep</p>
+                        </div>
+                        <div class="kpi" data-rig-kpi>
+                          <p class="kpi__label">Cash gap</p>
+                          <p class="kpi__value num"><span data-rig-count="38" data-suffix=" days">0 days</span></p>
+                          <p class="kpi__delta kpi__delta--down num">▼ 6 days worse</p>
+                        </div>
+                      </div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Onboarding</div>
-                      <div class="mrow__sub">Services</div>
-                    </div>
-                    <div class="mrow__val num">12%</div>
-                    <div class="mrow__bar">
-                      <span class="is-cau" data-grow="12%"></span>
-                    </div>
-                  </div>
+                      <div class="dash__panels">
+                        <div class="panel panel--chart">
+                          <div class="panel__head">
+                            <div>
+                              <p class="panel__eyebrow">Trend</p>
+                              <p class="panel__title">Contribution margin, 12 months</p>
+                            </div>
+                            <span class="pill pill--positive">Improving</span>
+                          </div>
+                          <svg class="chart" viewBox="0 0 420 132" preserveAspectRatio="none" aria-hidden="true">
+                            <defs>
+                              <linearGradient id="pmGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28" />
+                                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+                              </linearGradient>
+                            </defs>
+                            <path
+                              class="chart__area"
+                              data-rig-area
+                              d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28 L418 132 L0 132 Z"
+                            />
+                            <path
+                              class="chart__line"
+                              data-rig-draw
+                              d="M0 104 L38 98 L76 101 L114 86 L152 90 L190 72 L228 78 L266 58 L304 62 L342 42 L380 46 L418 28"
+                            />
+                            <circle class="chart__dot" cx="418" cy="28" r="4" data-rig-dot />
+                          </svg>
+                        </div>
 
-                  <div class="mrow">
-                    <div>
-                      <div class="mrow__name">Legacy plan</div>
-                      <div class="mrow__sub">412 accounts</div>
-                    </div>
-                    <div class="mrow__val num">−9%</div>
-                    <div class="mrow__bar">
-                      <span class="is-neg" data-grow="9%"></span>
+                        <div class="panel">
+                          <div class="panel__head">
+                            <div>
+                              <p class="panel__eyebrow">Breakdown</p>
+                              <p class="panel__title">Margin by product</p>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Atlas Pro</div>
+                              <div class="mrow__sub">1,204 units</div>
+                            </div>
+                            <div class="mrow__val num">61%</div>
+                            <div class="mrow__bar">
+                              <span class="is-pos" data-rig-grow="61%"></span>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Atlas Core</div>
+                              <div class="mrow__sub">3,880 units</div>
+                            </div>
+                            <div class="mrow__val num">38%</div>
+                            <div class="mrow__bar">
+                              <span class="is-pos" data-rig-grow="38%"></span>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Onboarding</div>
+                              <div class="mrow__sub">Services</div>
+                            </div>
+                            <div class="mrow__val num">12%</div>
+                            <div class="mrow__bar">
+                              <span class="is-cau" data-rig-grow="12%"></span>
+                            </div>
+                          </div>
+
+                          <div class="mrow" data-rig-row>
+                            <div>
+                              <div class="mrow__name">Legacy plan</div>
+                              <div class="mrow__sub">412 accounts</div>
+                            </div>
+                            <div class="mrow__val num">−9%</div>
+                            <div class="mrow__bar">
+                              <span class="is-neg" data-rig-grow="9%"></span>
+                            </div>
+                          </div>
+                        </div>
+
+                      <!-- Assistant — the last beat. It gets its own reserved
+                           column rather than floating over the panels: an
+                           assistant that covers the numbers it is describing
+                           is worse than one sitting beside them, and a
+                           reserved column means nothing reflows when it
+                           arrives. Opaque, not backdrop-filtered — it is
+                           transformed on a scrub, and sampling a backdrop
+                           every frame there is the rule this project already
+                           fixed once. -->
+                      <aside class="ai" data-ai aria-label="ProfitMe assistant">
+                        <div class="ai__head">
+                          <span class="ai__spark" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M8 1.5l1.5 4.2 4.2 1.5-4.2 1.5L8 12.9 6.5 8.7 2.3 7.2l4.2-1.5L8 1.5Z" fill="currentColor"/>
+                            </svg>
+                          </span>
+                          <span class="ai__title">Ask ProfitMe</span>
+                          <span class="ai__status">
+                            <span class="ai__dot" aria-hidden="true"></span>Connected
+                          </span>
+                        </div>
+
+                        <div class="ai__thread">
+                          <p class="ai__msg ai__msg--user" data-ai-user>
+                            Why did contribution drop in October?
+                          </p>
+
+                          <!-- Designed hold, not an accidental blank. Domain
+                               verb over a generic spinner — the pattern in
+                               references/dashboards/ (a labelled arc reading
+                               "Synthesizing…", never "Loading"). -->
+                          <p class="ai__thinking" data-ai-thinking>
+                            <span class="ai__arc" aria-hidden="true"></span>
+                            Reading 4,812 transactions…
+                          </p>
+
+                          <div class="ai__msg ai__msg--bot" data-ai-answer>
+                            <p>
+                              <strong>Legacy plan</strong> turned negative. 412
+                              accounts at −9% margin cost you
+                              <span class="ai__figure num">€18,400</span> this month.
+                            </p>
+                            <span class="ai__cite">
+                              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              Traced to 412 source rows
+                            </span>
+                          </div>
+                        </div>
+                      </aside>
+                      </div>
                     </div>
                   </div>
                 </div>

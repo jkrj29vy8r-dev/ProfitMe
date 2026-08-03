@@ -315,6 +315,27 @@ ease-in-out, and nothing springs or bounces.
    It runs once on mount, never on every re-render, and never on a value update
    (a changing number tweens, it does not re-grow from zero).
 
+   **The assembly order, read off that same capture (added 2026-08-03).** The
+   mid-load frame is not partially faded — it is partially *populated*, and what
+   is present versus absent is consistent:
+
+   | Present already | Still absent |
+   | --- | --- |
+   | Page chrome, eyebrows, panel titles | The area chart, entirely |
+   | Every KPI tile, including its final number | Every progress-bar fill (tracks visible, empty) |
+   | The ring gauge, arc drawn | The distribution bar and its headline % |
+   | The list of scored rows | The activity/timeline list, entirely |
+
+   So the order is **shell → labels → headline numbers → charts, bars and list
+   rows last**. Reveal sequences should follow it rather than fading a whole
+   panel in at once: the numbers a person came for arrive early, and the
+   supporting geometry resolves behind them. Fading the panel as one unit
+   inverts this — it withholds the number until the decoration is ready.
+
+9. **A sequence needs an ending.** After the last beat, hold. A choreographed
+   reveal that stops the instant its final element lands reads as having been
+   cut off; a beat of stillness at the end is what makes it read as finished.
+
 ### 3D scenes (WebGL) — derived 2026-08-01
 
 First real 3D work in the product: a Three.js hero scene. Vanilla Three.js, not
@@ -445,6 +466,13 @@ moment is the wrong trade for a tool opened daily, however good it looks in a
   analytics product and the state most often skipped — **not enough data yet**.
   That last one always follows the sample-data pattern in Data display below,
   never a blank panel.
+- **A hold names what it is doing** (added 2026-08-03). The loading state in
+  `dashboards/` is a small arc with the label "Synthesizing…" — a verb from the
+  product's own domain, not "Loading". Where the product is working, say what
+  it is working on ("Reading 4,812 transactions…"), because in an analytics
+  tool the thing being counted is itself information. Generic spinners are the
+  default this rule exists to prevent. The hold crossfades out *under* the
+  result rather than clearing first (Motion, principle 3).
 - **Status is never color alone**, anywhere in the product: sign, icon, or text
   label accompanies every semantic color use. This is the single rule most
   worth enforcing in review, since it is the easiest one to quietly drop under

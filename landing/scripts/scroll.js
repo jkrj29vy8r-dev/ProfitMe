@@ -261,47 +261,202 @@
       });
     });
 
-    /* --- 5. Sticky product reveal -------------------------------------- */
-    /* The page's one pinned moment. The dashboard is held while it rotates
-       up out of perspective and scales into place, scrubbed to scroll so the
-       user is driving it frame by frame.
+    /* --- 5. Cinematic product reveal ------------------------------------ */
+    /* The page's one pinned moment, and the only place a full sequence plays.
+       Everything below is a POSITION ON ONE TIMELINE rather than a set of
+       independent triggers — that is what makes it genuinely scroll-driven:
+       scrub a single timeline and every beat is a function of scroll offset,
+       so nothing can pop in on its own clock and scrubbing backwards runs the
+       whole sequence in reverse.
 
-       No blur on this timeline: the frame is the largest element on the page,
-       and blurring it while scrubbing is exactly the thing that would cost
-       the frame budget. Depth is carried by rotateX and scale instead. */
+       Beat order is not invented. The mid-load capture in
+       references/dashboards/ shows a real dashboard part-way through loading:
+       chrome, labels and headline numbers are already painted, while the area
+       chart, the progress bars and the activity list are still absent. So:
+       shell first, numbers second, charts and rows last, assistant last of
+       all. That is also the design system's "a dashboard assembles rather
+       than switching on", with the ordering filled in from evidence.
+
+       PERFORMANCE
+       The lid carries the entire dashboard subtree and rotates for the whole
+       scrub, so nothing inside it may animate a filter, and nothing inside it
+       samples a backdrop. Beats are transform/opacity, plus two SVG geometry
+       properties (strokeDashoffset, width) that are cheap on elements this
+       small. */
     var stage = document.querySelector("[data-pin-stage]");
-    var frame = document.querySelector("[data-pin-frame]");
     var stageHead = document.querySelector("[data-pin-head]");
+    var rig = document.querySelector("[data-rig]");
+    var rigScale = document.querySelector("[data-rig-scale]");
+    var laptop = document.querySelector("[data-laptop]");
+    var lid = document.querySelector("[data-laptop-lid]");
 
-    if (stage && frame && window.innerWidth >= 900) {
-      gsap.set(frame, { transformPerspective: 1400, transformOrigin: "50% 100%" });
+    var LID_W = 1000;
+    var LID_H = 625;
 
-      var pinTl = gsap.timeline({
+    /* The rig is laid out at a fixed design size, then scaled to the space
+       actually available — width-bound on narrow desktops, height-bound on
+       short ones, whichever bites first, so the laptop is never taller than
+       the viewport it is pinned inside. */
+    function fitRig() {
+      if (!rig || !rigScale || window.innerWidth < 900) return;
+      var byWidth = rig.clientWidth / LID_W;
+      /* The lid is not the only thing on the pinned stage — the head sits
+         above it and the deck reads below it — so the height budget is well
+         under the full viewport. 0.58 keeps the whole machine, including the
+         open-lid silhouette, inside a 900px-tall window. */
+      var byHeight = (window.innerHeight * 0.58) / LID_H;
+      var s = Math.min(byWidth, byHeight, 1);
+      rigScale.style.setProperty("--rig-scale", s.toFixed(4));
+      rigScale.style.setProperty("--rig-height", Math.round(LID_H * s) + "px");
+    }
+
+    if (stage && laptop && lid && window.innerWidth >= 900) {
+      fitRig();
+      window.addEventListener(
+        "resize",
+        function () {
+          fitRig();
+        },
+        { passive: true }
+      );
+
+      var kpis = stage.querySelectorAll("[data-rig-kpi]");
+      var rows = stage.querySelectorAll("[data-rig-row]");
+      var chrome = stage.querySelector("[data-rig-chrome]");
+      var area = stage.querySelector("[data-rig-area]");
+      var line = stage.querySelector("[data-rig-draw]");
+      var dot = stage.querySelector("[data-rig-dot]");
+      var ai = stage.querySelector("[data-ai]");
+      var aiUser = stage.querySelector("[data-ai-user]");
+      var aiThinking = stage.querySelector("[data-ai-thinking]");
+      var aiAnswer = stage.querySelector("[data-ai-answer]");
+
+      var lit = stage.querySelector("[data-laptop-lit]");
+      var glare = stage.querySelector("[data-laptop-glare]");
+
+      /* Resting states — everything absent, lid shut, screen dark. */
+      gsap.set(laptop, { rotateX: 18 });
+      gsap.set(lid, { rotateX: -90 });
+      gsap.set(lit, { opacity: 0 });
+      gsap.set(glare, { opacity: 1 });
+      gsap.set(chrome, { opacity: 0, y: 10 });
+      gsap.set(kpis, { opacity: 0, y: 14 });
+      gsap.set(".dash__panels", { opacity: 0 });
+      gsap.set(rows, { opacity: 0, x: -8 });
+      gsap.set(area, { opacity: 0 });
+      gsap.set(dot, { scale: 0, transformOrigin: "50% 50%" });
+      gsap.set(ai, { opacity: 0, y: 34 });
+      gsap.set([aiUser, aiThinking, aiAnswer], { opacity: 0, y: 8 });
+
+      var lineLen = line && line.getTotalLength ? line.getTotalLength() : 900;
+      gsap.set(line, { strokeDasharray: lineLen, strokeDashoffset: lineLen });
+
+      stage.querySelectorAll("[data-rig-grow]").forEach(function (el) {
+        gsap.set(el, { width: "0%" });
+      });
+
+      var tl = gsap.timeline({
+        defaults: { ease: "none" },
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: "+=90%",
+          /* Long enough that six beats each get real scroll distance. Too
+             short and the sequence reads as one blurred event. */
+          end: "+=260%",
           pin: true,
-          scrub: 0.6,
-          anticipatePin: 1
+          scrub: 0.7,
+          anticipatePin: 1,
+          invalidateOnRefresh: true
         }
       });
 
-      pinTl
-        .fromTo(
-          frame,
-          { scale: 0.84, rotateX: 15, y: 70, opacity: 0.55 },
-          { scale: 1, rotateX: 0, y: 0, opacity: 1, ease: "none" },
-          0
+      /* Beat 1 — the machine turns to face you and opens. */
+      /* The head clears out completely rather than lingering at low opacity:
+         it is positioned over the stage, so any residue sits on top of the
+         screen once the lid is upright. */
+      tl.to(stageHead, { y: -60, opacity: 0, duration: 0.13 }, 0)
+        .to(laptop, { rotateX: 3, duration: 0.34 }, 0)
+        .to(lid, { rotateX: 0, duration: 0.3 }, 0.02)
+
+        /* Beat 2 — the panel lights before anything is drawn on it. */
+        .to(lit, { opacity: 1, duration: 0.14 }, 0.16)
+        .to(glare, { opacity: 0.3, duration: 0.14 }, 0.16)
+
+        /* Beat 3 — chrome and labels, the first thing painted in the
+           reference's mid-load frame. */
+        .to(chrome, { opacity: 1, y: 0, duration: 0.08 }, 0.24)
+
+        /* Beat 4 — KPI tiles cascade, numbers running as they arrive. */
+        .to(
+          kpis,
+          { opacity: 1, y: 0, duration: 0.1, stagger: 0.035 },
+          0.3
         )
-        .fromTo(
-          stageHead,
-          { y: 0, opacity: 1 },
-          { y: -70, opacity: 0.25, ease: "none" },
-          0
+
+        /* Beat 5 — charts and rows, last to resolve. The line draws under
+           the user's own scroll rather than on a timer. */
+        .to(".dash__panels", { opacity: 1, duration: 0.06 }, 0.42)
+        .to(line, { strokeDashoffset: 0, duration: 0.22 }, 0.44)
+        .to(area, { opacity: 1, duration: 0.16 }, 0.5)
+        .to(dot, { scale: 1, duration: 0.05, ease: "back.out(2)" }, 0.65)
+        .to(rows, { opacity: 1, x: 0, duration: 0.08, stagger: 0.03 }, 0.46)
+
+        /* Beat 6 — the assistant arrives, asks, thinks, answers. The hold is
+           a designed state, and it crossfades out under the answer rather
+           than clearing first. */
+        .to(ai, { opacity: 1, y: 0, duration: 0.1 }, 0.6)
+        .to(aiUser, { opacity: 1, y: 0, duration: 0.05 }, 0.67)
+        .to(aiThinking, { opacity: 1, y: 0, duration: 0.04 }, 0.73)
+        /* Overlapping crossfade — the hold is still fading as the answer
+           arrives, never a blank gap between the two. */
+        .to(aiThinking, { opacity: 0, duration: 0.05 }, 0.82)
+        .to(aiAnswer, { opacity: 1, y: 0, duration: 0.06 }, 0.81);
+      /* 0.87 → 1.00 is deliberate hold: the finished screen sits still for a
+         beat before the pin releases, so the sequence has an ending rather
+         than just stopping. */
+
+      /* Counters ride the same timeline, so the numbers are literally a
+         function of scroll position. */
+      stage.querySelectorAll("[data-rig-count]").forEach(function (el, i) {
+        var target = parseFloat(el.getAttribute("data-rig-count"));
+        var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+        var prefix = el.getAttribute("data-prefix") || "";
+        var suffix = el.getAttribute("data-suffix") || "";
+        var obj = { v: 0 };
+        tl.to(
+          obj,
+          {
+            v: target,
+            duration: 0.16,
+            onUpdate: function () {
+              el.textContent =
+                prefix +
+                obj.v.toLocaleString(undefined, {
+                  minimumFractionDigits: decimals,
+                  maximumFractionDigits: decimals
+                }) +
+                suffix;
+            }
+          },
+          0.32 + i * 0.035
         );
-    } else if (frame) {
-      gsap.set(frame, { opacity: 1 });
+      });
+
+      /* Bars grow in the same late window as the chart. */
+      stage.querySelectorAll("[data-rig-grow]").forEach(function (el, i) {
+        tl.to(
+          el,
+          { width: el.getAttribute("data-rig-grow"), duration: 0.14 },
+          0.48 + i * 0.03
+        );
+      });
+
+      window.addEventListener("load", fitRig);
+    } else {
+      /* Narrow screens: no pin, no laptop, no sequence. The dashboard is a
+         plain panel and its contents reveal with the same patterns the rest
+         of the page uses, so nothing is stuck invisible. */
+      restRig(true);
     }
 
     /* --- 6. Parallax + depth ------------------------------------------- */
@@ -504,8 +659,129 @@
     return { words: words, ghosts: ghosts };
   }
 
+  /* The reveal rig outside its cinematic path.
+     `animate` true  → narrow screens: no pin and no laptop, but the contents
+                       still reveal on scroll like every other section.
+     `animate` false → reduced motion: everything already at its final value. */
+  function restRig(animate) {
+    var stage = document.querySelector("[data-pin-stage]");
+    if (!stage) return;
+
+    var statics = stage.querySelectorAll(
+      "[data-rig-chrome], [data-rig-kpi], [data-rig-row], [data-ai], [data-ai-user], [data-ai-answer], .dash__panels, [data-rig-area]"
+    );
+    statics.forEach(function (el) {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
+
+    /* The hold has nothing to hold for once the answer is already there. */
+    var thinking = stage.querySelector("[data-ai-thinking]");
+    if (thinking) thinking.style.display = "none";
+
+    var line = stage.querySelector("[data-rig-draw]");
+    var dot = stage.querySelector("[data-rig-dot]");
+    var bars = stage.querySelectorAll("[data-rig-grow]");
+    var counts = stage.querySelectorAll("[data-rig-count]");
+
+    function settle() {
+      if (line) {
+        line.style.strokeDasharray = "none";
+        line.style.strokeDashoffset = "0";
+      }
+      if (dot) dot.style.transform = "none";
+      bars.forEach(function (el) {
+        el.style.width = el.getAttribute("data-rig-grow");
+      });
+      counts.forEach(function (el) {
+        writeCount(el, parseFloat(el.getAttribute("data-rig-count")));
+      });
+    }
+
+    if (!animate || !window.gsap) {
+      settle();
+      return;
+    }
+
+    if (line) {
+      var len = line.getTotalLength ? line.getTotalLength() : 900;
+      gsap.set(line, { strokeDasharray: len, strokeDashoffset: len });
+      gsap.to(line, {
+        strokeDashoffset: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: line.closest(".panel--chart") || line,
+          start: "top 82%",
+          end: "bottom 60%",
+          scrub: 0.4
+        }
+      });
+    }
+
+    if (dot) {
+      gsap.fromTo(
+        dot,
+        { scale: 0, transformOrigin: "50% 50%" },
+        {
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(2)",
+          scrollTrigger: {
+            trigger: dot.closest(".panel--chart") || dot,
+            start: "bottom 68%",
+            once: true
+          }
+        }
+      );
+    }
+
+    bars.forEach(function (el) {
+      gsap.fromTo(
+        el,
+        { width: "0%" },
+        {
+          width: el.getAttribute("data-rig-grow"),
+          ease: "none",
+          scrollTrigger: {
+            trigger: el.closest(".panel") || el,
+            start: "top 85%",
+            end: "top 45%",
+            scrub: 0.5
+          }
+        }
+      );
+    });
+
+    counts.forEach(function (el) {
+      var obj = { v: 0 };
+      gsap.to(obj, {
+        v: parseFloat(el.getAttribute("data-rig-count")),
+        ease: "power3.out",
+        duration: 1.4,
+        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        onUpdate: function () {
+          writeCount(el, obj.v);
+        }
+      });
+    });
+  }
+
+  /* Shared number formatter — the counters in the rig and the ones elsewhere
+     on the page must format identically, so there is one implementation. */
+  function writeCount(el, value) {
+    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+    el.textContent =
+      (el.getAttribute("data-prefix") || "") +
+      value.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }) +
+      (el.getAttribute("data-suffix") || "");
+  }
+
   /* Everything at rest, for reduced-motion users. */
   function restAll() {
+    restRig(false);
     document
       .querySelectorAll(
         "[data-reveal-item], [data-card], [data-card-solo], [data-pin-frame], [data-hero-in], .sw"
