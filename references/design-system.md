@@ -354,9 +354,21 @@ becomes a React app, this scene graph ports to R3F components near 1:1.
     MSAA is near-free on real GPU hardware but not on integrated/software
     rendering, and retina sharpness is not what makes ambient decoration read
     as premium — holding frame rate is.
-  - Below the width where the 2D hero already drops decorative depth, skip
-    initializing the scene at all — a 3D scene is the most GPU/battery-costly
-    thing on the page and has no place on a phone showing a single-column hero.
+  - **Runs on phones too, in a compact mode** (below 700px) — reversed
+    2026-08-02, per explicit direction: the scene should not read as a
+    desktop-only feature. `compact` mode changes exactly two things: (1)
+    pixel ratio caps at 1 instead of 1.5 and the particle field drops from
+    100 to 45 points — pure GPU/battery cost reduction, phone hardware and
+    battery budget are both tighter than a laptop; (2) every floater moves
+    to the four corners of the viewport (|yFrac| >= ~0.74, pushed further
+    from center than the desktop's |xFrac| >= 0.5) and shrinks slightly,
+    because a phone hero is a single tall stacked column that fills most of
+    the viewport in both dimensions — the desktop margin rule doesn't leave
+    enough clearance on a narrow screen, and corners are what actually stays
+    free regardless of how much text the column holds. Verified with
+    device-emulated captures at two real viewport sizes (390×844 and a
+    320×568 short/narrow case) confirming no overlap with the fixed nav or
+    the hero copy in either theme.
   - Detect WebGL availability and fall back to the plain CSS surface
     underneath rather than erroring — a decorative layer must never be able to
     break the page it decorates.

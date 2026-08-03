@@ -18,15 +18,32 @@
    - Every repeating group (chart bars) is merged into a single BufferGeometry:
      one draw call instead of N.
    - Particle field is one THREE.Points draw call regardless of count.
-   - Devicelet ratio capped — GPU cost on retina displays is quadratic in
+   - Device pixel ratio capped — GPU cost on retina displays is quadratic in
      pixel ratio, and this scene does not need retina sharpness to read as
-     premium; it needs to hold frame rate.
+     premium; it needs to hold frame rate. Capped further on phones (see
+     COMPACT MODE below), where the GPU is weaker and the display is smaller
+     anyway.
    - The render loop is owned by requestAnimationFrame and stops completely
      (not throttled — CANCELLED) whenever the hero is off-screen or the tab
      is hidden. An WebGL context doing nothing still schedules work if the
      loop keeps calling itself; the loop itself has to stop.
    - Rotation is continuous but slow (40–140s per revolution) — "everything
      slowly rotates" taken literally, like a museum turntable, not a spin.
+
+   COMPACT MODE (phones, <700px)
+   Runs on phones now, not just desktop — explicit product decision, since a
+   hero this decorative shouldn't read as a "desktop-only" feature. Two things
+   change under `compact`, nothing else:
+   - Pixel ratio caps lower and the particle field is smaller (both pure GPU
+     cost reduction — a phone GPU is weaker per-watt and the battery budget
+     is tighter than a laptop plugged into a wall).
+   - Every floater's (xFrac, yFrac) moves to the four corners and stays at
+     |yFrac| >= ~0.82. A phone hero is a single tall stacked column (eyebrow,
+     headline, sub, buttons, note) that fills most of the viewport width AND
+     height, unlike the desktop's centered block with wide open margins either
+     side — the old desktop margin rule (|xFrac| >= 0.5) is nowhere near
+     enough clearance on a narrow screen. Corners, not sides, are what stays
+     genuinely free on a phone hero at any content length.
    ========================================================================== */
 
 import * as THREE from "three";
@@ -303,11 +320,9 @@ function init() {
   var mount = document.querySelector("[data-hero-scene]");
   if (!mount) return;
 
-  /* Below this width the hero already drops decorative depth (see hero.css
-     — the type carries the section alone on narrow screens). A 3D scene is
-     the most GPU/battery-expensive thing on the page; it has no business
-     running on a phone showing a single-column hero. */
-  if (window.innerWidth < 900) return;
+  /* Runs at any width now. `compact` reduces cost and moves floaters into
+     the corners — see the COMPACT MODE note at the top of this file. */
+  var compact = window.innerWidth < 700;
 
   var canvas = document.createElement("canvas");
   canvas.className = "hero-scene__canvas";
@@ -340,7 +355,7 @@ function init() {
     alpha: false,
     powerPreference: "high-performance"
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.5));
   renderer.shadowMap.enabled = false;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -383,7 +398,7 @@ function init() {
     bgScene.add(bgQuad);
 
   /* --- Particles: one draw call regardless of count ---------------------- */
-  var PARTICLE_COUNT = 100;
+  var PARTICLE_COUNT = compact ? 45 : 100;
   var positions = new Float32Array(PARTICLE_COUNT * 3);
   var seeds = new Float32Array(PARTICLE_COUNT * 3); // per-particle phase/speed/scale
   for (var i = 0; i < PARTICLE_COUNT; i++) {
@@ -526,10 +541,16 @@ function init() {
      around a single focal subject (design-system.md, Motion → 3D scenes).
      Nine floaters was already more than anything in the library; this pass
      trims to six rather than adding more. */
-  [
-    { glyph: "€", xFrac: -0.62, yFrac: 0.4, z: -1, r: 0.62, period: 58 },
-    { glyph: "$", xFrac: 0.66, yFrac: 0.5, z: -2.2, r: 0.48, period: 74 }
-  ].forEach(function (c) {
+  (compact
+    ? [
+        { glyph: "€", xFrac: -0.72, yFrac: 0.74, z: -1, r: 0.46, period: 58 },
+        { glyph: "$", xFrac: 0.72, yFrac: 0.74, z: -1.6, r: 0.38, period: 74 }
+      ]
+    : [
+        { glyph: "€", xFrac: -0.62, yFrac: 0.4, z: -1, r: 0.62, period: 58 },
+        { glyph: "$", xFrac: 0.66, yFrac: 0.5, z: -2.2, r: 0.48, period: 74 }
+      ]
+  ).forEach(function (c) {
     var faceMap = coinFaceTexture(c.glyph, theme);
     var rimColor = new THREE.Color(theme.accent);
     var rimMat = new THREE.MeshStandardMaterial({
@@ -561,7 +582,11 @@ function init() {
 
   /* Documents — thin rounded cards, canvas-textured. One, not two, per the
      fewer-objects note above. */
-  [{ xFrac: -0.82, yFrac: -0.48, z: -2.5, period: 110 }].forEach(function (d) {
+  [
+    compact
+      ? { xFrac: -0.78, yFrac: -0.82, z: -2.5, period: 110 }
+      : { xFrac: -0.82, yFrac: -0.48, z: -2.5, period: 110 }
+  ].forEach(function (d) {
     var tex = invoiceTexture(theme);
     var mat = new THREE.MeshStandardMaterial({
       map: tex,
@@ -570,7 +595,8 @@ function init() {
       roughness: 0.7,
       side: THREE.DoubleSide
     });
-    var mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.65), mat);
+    var scale = compact ? 0.7 : 1;
+    var mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.35 * scale, 1.65 * scale), mat);
     addFloater(mesh, {
       xFrac: d.xFrac,
       yFrac: d.yFrac,
@@ -580,15 +606,17 @@ function init() {
       period: d.period,
       driftAmp: 0.14,
       depth: 0.85,
-      shadowScale: 1.5,
-      shadowOffsetY: -0.85
+      shadowScale: compact ? 1.0 : 1.5,
+      shadowOffsetY: compact ? -0.55 : -0.85
     });
   });
 
   /* Dashboard KPI card — same texture language as the 2D dashboard mock. One,
      not two, per the fewer-objects note above. */
   [
-    { label: "Contribution", value: "€31.2k", up: false, xFrac: 0.72, yFrac: -0.2, z: -1.5, period: 88 }
+    compact
+      ? { label: "Contribution", value: "€31.2k", up: false, xFrac: 0.78, yFrac: -0.82, z: -1.5, period: 88 }
+      : { label: "Contribution", value: "€31.2k", up: false, xFrac: 0.72, yFrac: -0.2, z: -1.5, period: 88 }
   ].forEach(function (k) {
     var tex = kpiTexture(k.label, k.value, k.up, theme);
     var mat = new THREE.MeshStandardMaterial({
@@ -598,7 +626,8 @@ function init() {
       roughness: 0.65,
       side: THREE.DoubleSide
     });
-    var mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.65, 0.98), mat);
+    var scale = compact ? 0.7 : 1;
+    var mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.65 * scale, 0.98 * scale), mat);
     addFloater(mesh, {
       xFrac: k.xFrac,
       yFrac: k.yFrac,
@@ -608,8 +637,8 @@ function init() {
       period: k.period,
       driftAmp: 0.12,
       depth: 0.7,
-      shadowScale: 1.7,
-      shadowOffsetY: -0.55
+      shadowScale: compact ? 1.1 : 1.7,
+      shadowOffsetY: compact ? -0.4 : -0.55
     });
   });
 
@@ -643,16 +672,17 @@ function init() {
       roughness: 0.5
     });
     var mesh = new THREE.Mesh(merged, mat);
+    if (compact) mesh.scale.setScalar(0.6);
     addFloater(mesh, {
-      xFrac: -0.56,
-      yFrac: -0.74,
+      xFrac: compact ? -0.62 : -0.56,
+      yFrac: compact ? 0.76 : -0.74,
       z: -0.9,
       tiltX: 0.22,
       period: 120,
       driftAmp: 0.1,
       depth: 1,
-      shadowScale: 1.9,
-      shadowOffsetY: -0.75
+      shadowScale: compact ? 1.1 : 1.9,
+      shadowOffsetY: compact ? -0.35 : -0.75
     });
   })();
 
@@ -677,16 +707,17 @@ function init() {
       emissiveIntensity: 0.25
     });
     var mesh = new THREE.Mesh(geo, mat);
+    if (compact) mesh.scale.setScalar(0.65);
     addFloater(mesh, {
-      xFrac: 0.58,
-      yFrac: 0.7,
+      xFrac: compact ? 0.6 : 0.58,
+      yFrac: compact ? -0.82 : 0.7,
       z: -1.0,
       tiltX: -0.1,
       period: 84,
       driftAmp: 0.15,
       depth: 1.05,
-      shadowScale: 1.4,
-      shadowOffsetY: -0.4
+      shadowScale: compact ? 0.9 : 1.4,
+      shadowOffsetY: compact ? -0.3 : -0.4
     });
   })();
 
