@@ -76,6 +76,14 @@ Muted and darker than a marketing gold — this is metal-under-gallery-light, no
 a coin icon. If it looks like a crypto-app accent, it's oversaturated; pull
 saturation down before pulling lightness down.
 
+**`glow-accent`** (added 2026-08-02) — `hsl(28, 58%, 45%, 0.55)` dark /
+`hsl(28, 62%, 36%, 0.4)` light. A static glow value, for the one or two focal
+points per screen that earn a glow (the hero scene's single light source, the
+product-reveal chart's line and leading dot) — never applied to anything that
+animates the filter itself, only to elements whose ancestor is transformed
+(see Motion, 3D scenes addendum). Copper, per the decision above, where the
+pattern itself shows as blue in Verdikt.
+
 ### Semantic — profit, loss, caution
 
 Never used for brand/interactive chrome. Never appear without a text label, icon,
@@ -362,6 +370,47 @@ becomes a React app, this scene graph ports to R3F components near 1:1.
   measured here reflects software rasterization, not user hardware, and is
   pessimistic by construction. Design conservatively for that reason — don't
   report a software-rendered number as if it were the real-hardware one.
+
+### Addendum — derived 2026-08-02, from `references/animations/` (6 clips)
+
+A batch of new motion references (four site builds, filed at reduced
+evidentiary weight — see that folder's README) surfaced one reveal variant
+worth adding to the principles above, and closed three items that had been
+open since the first hero-scene pass.
+
+- **Echo-resolve, a variant of "reveal with opacity, not translation."**
+  Two of the six clips (a tattoo-studio hero, a crypto-fund portfolio list)
+  resolve kinetic type from a brief duplicated/ghost line rather than a plain
+  rise. Layered onto the existing blur+yPercent word reveal as an additive
+  afterimage — never a replacement for it, and never used on scrubbed
+  surfaces, only the same one-shot `[data-split]` moment. The ghost is
+  copper-tinted, appears at ~40% opacity for ~0.4s starting slightly after
+  the word begins rising, and dissolves before the word finishes settling.
+  Absolutely positioned over the live word so it carries no layout weight.
+- **The hero scene's one light source was still functionally absent.**
+  Flagged in the first pass (two beam planes at 12–16% opacity) and left
+  unfixed. Replaced with the existing background shader's own glow term,
+  strengthened rather than supplemented with new geometry — cheaper (no new
+  draw calls) and closer to the single-dominant-glow pattern this batch
+  reconfirms (a title-reveal glow in two of the four sites shown).
+- **Contact shadows and a directional shading wash, also still open.**
+  Every floater now carries a camera-facing sprite shadow (Spline's own
+  technique, cited in the first pass and never implemented), and the two
+  canvas-textured surfaces that had no light-catch cue (invoices, KPI cards)
+  now carry the same upper-left highlight wash the coin faces already had.
+- **Floater count: resolved to fewer, not more.** Nine floating objects was
+  already denser than anything in the reference library; this batch's two
+  single-focal-subject compositions (product hero, portrait hero) reinforce
+  the original recommendation rather than the alternative. Trimmed to six —
+  two coins, one invoice, one KPI card, the bar chart, the line chart —
+  keeping one from each side of the centred headline column.
+
+Explicitly not adopted from this batch: the lime, glitch-red and purple
+accents shown (each is one more data point against a hue this system already
+ruled out or never considered), numbered section indices (chapters already
+use words, deliberately), and a literal preloader sequence (a blocking load
+moment is the wrong trade for a tool opened daily, however good it looks in a
+9-second clip).
 
 ## Component conventions — derived (2026-08-01)
 

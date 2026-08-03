@@ -372,17 +372,23 @@
   fill: url(#pmGrad);
 }
 
-/* Draw is scrubbed to scroll position by ScrollTrigger. */
+/* Draw is scrubbed to scroll position by ScrollTrigger. Both carry a static
+   glow — never an animated one, since this sits inside the pinned frame that
+   scales every frame during the scrub, and an animated filter there would be
+   the single most expensive thing on the page. Copper, per the brand
+   decision, not the blue this pattern shows as in Verdikt. */
 .chart__line {
   fill: none;
   stroke: var(--accent);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px var(--glow-accent));
 }
 
 .chart__dot {
   fill: var(--accent);
+  filter: drop-shadow(0 0 5px var(--glow-accent));
 }
 
 /* Sample-data notice — the "not enough data yet" state, designed rather than

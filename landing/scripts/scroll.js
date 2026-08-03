@@ -88,12 +88,22 @@
     /* --- 2. Text reveal ------------------------------------------------- */
     /* Words rise, unblur and fade in on a stagger. Blur here is a timed tween
        on small inline elements — cheap, and it is what gives the type the
-       "resolving into focus" quality rather than a flat fade. */
+       "resolving into focus" quality rather than a flat fade.
+
+       A copper afterimage trails each word and dissolves before the word
+       settles — measured off two clips in references/animations/ (Monolith's
+       "MEET THE ARTIST", Dragonfly's company list), both of which resolve
+       kinetic type from a duplicated/ghost stack rather than a plain rise.
+       Layered on top of the existing reveal, not a replacement for it: same
+       transform/opacity-only budget, same once-per-element trigger. */
     document.querySelectorAll("[data-split]").forEach(function (el) {
-      var words = splitWords(el);
+      var split = splitWords(el);
+      var words = split.words;
+      var ghosts = split.ghosts;
       if (!words.length) return;
 
       gsap.set(words, { yPercent: 118, opacity: 0, filter: "blur(9px)" });
+      gsap.set(ghosts, { yPercent: 150, opacity: 0 });
 
       ScrollTrigger.create({
         trigger: el,
@@ -112,6 +122,24 @@
                  on the element keeps it on a rasterised layer for the rest
                  of the session for no benefit. */
               gsap.set(words, { filter: "none", willChange: "auto" });
+            }
+          });
+          gsap.to(ghosts, {
+            yPercent: 0,
+            opacity: 0.4,
+            duration: 0.4,
+            ease: "power2.out",
+            stagger: 0.045,
+            delay: 0.08
+          });
+          gsap.to(ghosts, {
+            opacity: 0,
+            duration: 0.45,
+            ease: "power1.in",
+            stagger: 0.045,
+            delay: 0.42,
+            onComplete: function () {
+              gsap.set(ghosts, { willChange: "auto" });
             }
           });
         }
@@ -150,6 +178,18 @@
       var cards = group.querySelectorAll("[data-card]");
       if (!cards.length) return;
 
+      /* Icon strokes draw in just after the card settles, reusing the same
+         getTotalLength/strokeDashoffset technique already proven on the
+         product-reveal chart (#7 below) — timed, not scrubbed, since these
+         are small one-shot elements rather than a scroll-linked surface.
+         Extracted from Drip's icon-assembles-with-the-stat clip in
+         references/animations/. */
+      var icons = group.querySelectorAll("[data-icon-draw]");
+      icons.forEach(function (shape) {
+        var len = shape.getTotalLength ? shape.getTotalLength() : 60;
+        gsap.set(shape, { strokeDasharray: len, strokeDashoffset: len });
+      });
+
       gsap.set(cards, {
         y: 56,
         opacity: 0,
@@ -177,6 +217,15 @@
               gsap.set(cards, { filter: "none", willChange: "auto" });
             }
           });
+          if (icons.length) {
+            gsap.to(icons, {
+              strokeDashoffset: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              stagger: 0.09,
+              delay: 0.25
+            });
+          }
         }
       });
     });
@@ -410,9 +459,16 @@
 
   /* Wrap each word in a span while preserving inline markup (the accent <em>
      inside the hero headline has to survive the split). Word spans sit inside
-     a clipping wrapper so the rise reads as a mask rather than a slide. */
+     a clipping wrapper so the rise reads as a mask rather than a slide.
+
+     Each clip also gets a "ghost" twin — the same text, absolutely
+     positioned over the live word — which the reveal briefly shows and
+     dissolves as the copper afterimage described above. It carries no
+     layout weight (position: absolute) so it never changes how the words
+     wrap. */
   function splitWords(root) {
-    var spans = [];
+    var words = [];
+    var ghosts = [];
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     var nodes = [];
     var n;
@@ -432,14 +488,20 @@
         var word = document.createElement("span");
         word.className = "sw";
         word.textContent = chunk;
+        var ghost = document.createElement("span");
+        ghost.className = "sw-ghost";
+        ghost.textContent = chunk;
+        ghost.setAttribute("aria-hidden", "true");
         clip.appendChild(word);
+        clip.appendChild(ghost);
         frag.appendChild(clip);
-        spans.push(word);
+        words.push(word);
+        ghosts.push(ghost);
       });
       node.parentNode.replaceChild(frag, node);
     });
 
-    return spans;
+    return { words: words, ghosts: ghosts };
   }
 
   /* Everything at rest, for reduced-motion users. */
@@ -456,6 +518,13 @@
     document.querySelectorAll("[data-draw]").forEach(function (p) {
       p.style.strokeDasharray = "none";
       p.style.strokeDashoffset = "0";
+    });
+    document.querySelectorAll("[data-icon-draw]").forEach(function (p) {
+      p.style.strokeDasharray = "none";
+      p.style.strokeDashoffset = "0";
+    });
+    document.querySelectorAll(".sw-ghost").forEach(function (g) {
+      g.style.opacity = "0";
     });
     document.querySelectorAll("[data-grow]").forEach(function (el) {
       el.style.width = el.getAttribute("data-grow");

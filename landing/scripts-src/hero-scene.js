@@ -124,6 +124,24 @@ function invoiceTexture(theme) {
     ? "rgba(255,255,255,0.92)"
     : "rgba(26,23,18,0.9)";
   ctx.fill();
+
+  /* Directional light-catch wash — upper-left highlight fading to a soft
+     lower-right falloff, baked into the texture rather than left flat. Coins
+     already had this via coinFaceTexture's radial gradient; invoices and KPI
+     cards didn't, which is why the scene's single key light visibly caught
+     the coins but read as flat paper everywhere else (see design-system.md,
+     Motion → 3D scenes). */
+  ctx.save();
+  roundRectPath(ctx, 1, 1, 178, 218, 14);
+  ctx.clip();
+  var wash = ctx.createLinearGradient(0, 0, 180, 220);
+  wash.addColorStop(0, theme.isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.12)");
+  wash.addColorStop(0.45, "rgba(255,255,255,0)");
+  wash.addColorStop(1, theme.isLight ? "rgba(0,0,0,0.05)" : "rgba(0,0,0,0.24)");
+  ctx.fillStyle = wash;
+  ctx.fillRect(0, 0, 180, 220);
+  ctx.restore();
+
   ctx.strokeStyle = theme.isLight
     ? "rgba(0,0,0,0.08)"
     : "rgba(255,255,255,0.09)";
@@ -184,6 +202,19 @@ function kpiTexture(label, value, deltaUp, theme) {
     ? "rgba(255,255,255,0.92)"
     : "rgba(26,23,18,0.9)";
   ctx.fill();
+
+  /* Same light-catch wash as invoiceTexture — see the comment there. */
+  ctx.save();
+  roundRectPath(ctx, 1, 1, 218, 128, 14);
+  ctx.clip();
+  var wash = ctx.createLinearGradient(0, 0, 220, 130);
+  wash.addColorStop(0, theme.isLight ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.12)");
+  wash.addColorStop(0.45, "rgba(255,255,255,0)");
+  wash.addColorStop(1, theme.isLight ? "rgba(0,0,0,0.05)" : "rgba(0,0,0,0.24)");
+  ctx.fillStyle = wash;
+  ctx.fillRect(0, 0, 220, 130);
+  ctx.restore();
+
   ctx.strokeStyle = theme.isLight
     ? "rgba(0,0,0,0.08)"
     : "rgba(255,255,255,0.09)";
@@ -251,7 +282,15 @@ var bgFragment =
   "  vec2 p = vUv - vec2(0.5 + sin(uTime*0.045)*0.10, 0.82 + cos(uTime*0.037)*0.05);\n" +
   "  p.x *= uAspect;\n" +
   "  float d = length(p);\n" +
-  "  float glow = smoothstep(0.62, 0.0, d) * 0.22;\n" +
+  /* This is the scene's one dominant light source — a single soft glow behind
+     the headline, the pattern measured off Verdikt's dashboard hero and, now,
+     the title-reveal glow in two of the references/animations clips
+     (Anyflow's vortex mark, Dragonfly's wordmark). It replaces two separate
+     light-beam planes that rendered at 12–16% opacity and read as functionally
+     absent (design-system.md, Motion → 3D scenes flagged this as open). One
+     stronger glow, in copper, is both cheaper (no extra draw calls) and closer
+     to what every "premium lighting" reference in the library actually does. */
+  "  float glow = smoothstep(0.7, 0.0, d) * 0.4;\n" +
   "  col += uGlow * glow;\n" +
   "  gl_FragColor = vec4(col, 1.0);\n" +
   "}";
@@ -380,40 +419,23 @@ function init() {
   scene.add(particles);
   var basePositions = positions.slice();
 
-  /* --- Light beams: two soft translucent planes --------------------------
-     A canvas-authored vertical gradient (opaque middle, transparent ends) so
-     the edges are soft without a blurred material — the "static blur, only
-     transform" rule again, just via texture authoring instead of a filter. */
-  var beamTex = (function () {
-    var s = makeCanvas(24, 256);
-    var g = s.ctx.createLinearGradient(0, 0, 0, 256);
-    g.addColorStop(0, "rgba(255,255,255,0)");
-    g.addColorStop(0.5, "rgba(255,255,255,0.55)");
-    g.addColorStop(1, "rgba(255,255,255,0)");
+  /* --- Contact shadows: one soft dark decal per floater --------------------
+     Every reference that reads as premium grounds its floating shapes with a
+     shadow, even without a visible floor (Spline: a contact shadow under
+     every shape; the logistics concept: a shadow under every tilted panel).
+     A THREE.Sprite always faces the camera for free, so this is one cheap
+     billboarded blob per object rather than a rotation-aware mesh — it
+     follows the object's drift but, correctly, never spins with it. */
+  var shadowTex = (function () {
+    var s = makeCanvas(64, 64);
+    var g = s.ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, "rgba(0,0,0,0.6)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
     s.ctx.fillStyle = g;
-    s.ctx.fillRect(0, 0, 24, 256);
+    s.ctx.fillRect(0, 0, 64, 64);
     return new THREE.CanvasTexture(s.c);
   })();
-  var beamGroup = new THREE.Group();
-  [
-    { x: -3.2, z: -3, rot: 0.22, w: 1.1, h: 9, op: 0.16 },
-    { x: 3.6, z: -4, rot: -0.18, w: 0.9, h: 8, op: 0.12 }
-  ].forEach(function (b) {
-    var mat = new THREE.MeshBasicMaterial({
-      map: beamTex,
-      transparent: true,
-      opacity: b.op * (theme.isLight ? 0.7 : 1),
-      color: new THREE.Color(theme.accentHover),
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide
-    });
-    var mesh = new THREE.Mesh(new THREE.PlaneGeometry(b.w, b.h), mat);
-    mesh.position.set(b.x, 0.5, b.z);
-    mesh.rotation.z = b.rot;
-    beamGroup.add(mesh);
-  });
-  scene.add(beamGroup);
+  var shadowSprites = [];
 
   /* --- Floating objects group ---------------------------------------------
      Positioned in screen-fraction space, not raw world coordinates — this
@@ -447,8 +469,24 @@ function init() {
     if (opts.tiltX) mesh.rotation.x = opts.tiltX;
     if (opts.tiltZ) mesh.rotation.z = opts.tiltZ;
     scene.add(mesh);
+
+    var shadow = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: shadowTex,
+        color: 0x000000,
+        transparent: true,
+        opacity: theme.isLight ? 0.22 : 0.4,
+        depthWrite: false
+      })
+    );
+    var shadowScale = opts.shadowScale || 1.2;
+    shadow.scale.set(shadowScale, shadowScale * 0.42, 1);
+    scene.add(shadow);
+    shadowSprites.push(shadow);
+
     floaters.push({
       mesh: mesh,
+      shadow: shadow,
       xFrac: opts.xFrac,
       yFrac: opts.yFrac,
       z: opts.z,
@@ -458,7 +496,9 @@ function init() {
       driftAmp: opts.driftAmp || 0.22,
       driftPeriod: opts.driftPeriod || 9000 + Math.random() * 4000,
       phase: Math.random() * Math.PI * 2,
-      depth: opts.depth || 1
+      depth: opts.depth || 1,
+      shadowOffsetY: opts.shadowOffsetY != null ? opts.shadowOffsetY : -0.6,
+      shadowOffsetZ: opts.shadowOffsetZ != null ? opts.shadowOffsetZ : -0.3
     });
   }
 
@@ -469,15 +509,26 @@ function init() {
     floaters.forEach(function (f) {
       var pos = screenToWorld(f.xFrac, f.yFrac, f.z);
       f.base.set(pos.x, pos.y, f.z);
+      f.shadow.position.set(
+        pos.x,
+        pos.y + f.shadowOffsetY,
+        f.z + f.shadowOffsetZ
+      );
     });
   }
 
   /* Coins — short cylinders so a real bevelled edge is visible at every
-     rotation, unlike a flat disc which vanishes edge-on. */
+     rotation, unlike a flat disc which vanishes edge-on.
+
+     Two, not three: the reference set's actual 3D-composition principle is
+     fewer, larger, better-lit, grounded objects, not a dense field of small
+     ones — confirmed again by Monolith and Drip, both of which compose
+     around a single focal subject (design-system.md, Motion → 3D scenes).
+     Nine floaters was already more than anything in the library; this pass
+     trims to six rather than adding more. */
   [
     { glyph: "€", xFrac: -0.62, yFrac: 0.4, z: -1, r: 0.62, period: 58 },
-    { glyph: "$", xFrac: 0.66, yFrac: 0.5, z: -2.2, r: 0.48, period: 74 },
-    { glyph: "₿", xFrac: 0.56, yFrac: -0.62, z: -3, r: 0.4, period: 96 }
+    { glyph: "$", xFrac: 0.66, yFrac: 0.5, z: -2.2, r: 0.48, period: 74 }
   ].forEach(function (c) {
     var faceMap = coinFaceTexture(c.glyph, theme);
     var rimColor = new THREE.Color(theme.accent);
@@ -502,15 +553,15 @@ function init() {
       tiltZ: 0.15,
       period: c.period,
       driftAmp: 0.16,
-      depth: 1.1
+      depth: 1.1,
+      shadowScale: c.r * 2.1,
+      shadowOffsetY: -0.45
     });
   });
 
-  /* Documents — thin rounded cards, canvas-textured. */
-  [
-    { xFrac: -0.82, yFrac: -0.48, z: -2.5, period: 110 },
-    { xFrac: 0.8, yFrac: 0.08, z: -3.4, period: 130 }
-  ].forEach(function (d) {
+  /* Documents — thin rounded cards, canvas-textured. One, not two, per the
+     fewer-objects note above. */
+  [{ xFrac: -0.82, yFrac: -0.48, z: -2.5, period: 110 }].forEach(function (d) {
     var tex = invoiceTexture(theme);
     var mat = new THREE.MeshStandardMaterial({
       map: tex,
@@ -528,13 +579,15 @@ function init() {
       tiltZ: 0.06,
       period: d.period,
       driftAmp: 0.14,
-      depth: 0.85
+      depth: 0.85,
+      shadowScale: 1.5,
+      shadowOffsetY: -0.85
     });
   });
 
-  /* Dashboard KPI cards — same texture language as the 2D dashboard mock. */
+  /* Dashboard KPI card — same texture language as the 2D dashboard mock. One,
+     not two, per the fewer-objects note above. */
   [
-    { label: "Margin", value: "42.8%", up: true, xFrac: -0.7, yFrac: 0.72, z: -4.2, period: 105 },
     { label: "Contribution", value: "€31.2k", up: false, xFrac: 0.72, yFrac: -0.2, z: -1.5, period: 88 }
   ].forEach(function (k) {
     var tex = kpiTexture(k.label, k.value, k.up, theme);
@@ -554,7 +607,9 @@ function init() {
       tiltZ: -0.04,
       period: k.period,
       driftAmp: 0.12,
-      depth: 0.7
+      depth: 0.7,
+      shadowScale: 1.7,
+      shadowOffsetY: -0.55
     });
   });
 
@@ -595,7 +650,9 @@ function init() {
       tiltX: 0.22,
       period: 120,
       driftAmp: 0.1,
-      depth: 1
+      depth: 1,
+      shadowScale: 1.9,
+      shadowOffsetY: -0.75
     });
   })();
 
@@ -627,7 +684,9 @@ function init() {
       tiltX: -0.1,
       period: 84,
       driftAmp: 0.15,
-      depth: 1.05
+      depth: 1.05,
+      shadowScale: 1.4,
+      shadowOffsetY: -0.4
     });
   })();
 
@@ -724,6 +783,9 @@ function init() {
     fill.groundColor.set(theme.isLight ? 0x9c8060 : 0x0b0908);
     fill.intensity = theme.isLight ? 0.55 : 0.7;
     key.intensity = theme.isLight ? 1.1 : 1.4;
+    shadowSprites.forEach(function (s) {
+      s.material.opacity = theme.isLight ? 0.22 : 0.4;
+    });
   }).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"]
@@ -773,6 +835,10 @@ function init() {
       f.mesh.position.x = f.base.x + Math.sin(driftT) * f.driftAmp;
       f.mesh.position.y =
         f.base.y + Math.cos(driftT * 0.8) * f.driftAmp * 0.8;
+      /* The shadow tracks the object's drift but, correctly, never its
+         spin — a sprite always faces the camera, so it doesn't need to. */
+      f.shadow.position.x = f.mesh.position.x;
+      f.shadow.position.y = f.mesh.position.y + f.shadowOffsetY;
     });
 
     var pa = particleGeo.attributes.position.array;

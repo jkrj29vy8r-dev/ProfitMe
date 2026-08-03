@@ -257,6 +257,7 @@ svg {
 
 .sw-clip {
   display: inline-block;
+  position: relative;
   overflow: hidden;
   vertical-align: bottom;
   padding-bottom: 0.06em;
@@ -265,6 +266,19 @@ svg {
 
 .sw {
   display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* A brief copper afterimage that trails each word in on scroll, then
+   dissolves — see scroll.js's [data-split] handler. Absolutely positioned
+   over the live word so it carries no layout weight and never changes how
+   the line wraps. */
+.sw-ghost {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: inline-block;
+  color: var(--accent);
   will-change: transform, opacity;
 }
 
@@ -288,6 +302,10 @@ svg {
     transform: none !important;
     opacity: 1 !important;
     filter: none !important;
+  }
+
+  .sw-ghost {
+    opacity: 0 !important;
   }
 }
 
