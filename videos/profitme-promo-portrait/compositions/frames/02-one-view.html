@@ -1,0 +1,182 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: block; }
+    @font-face { font-family: "Inter"; src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: block; }
+
+    #root {
+      width: 1080px; height: 1920px; position: relative; overflow: hidden;
+      font-family: "Inter", sans-serif; -webkit-font-smoothing: antialiased;
+    }
+
+    .ov-ground { position: absolute; inset: 0; background: #fbfaf8; }
+
+    .ov-eyebrow {
+      position: absolute; left: 72px; top: 212px;
+      font-size: 23px; font-weight: 500; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #955823;
+    }
+
+    .ov-title {
+      position: absolute; left: 72px; top: 258px; width: 936px;
+      font-size: 70px; font-weight: 600; line-height: 1.02;
+      letter-spacing: -0.03em; color: #231f1a;
+    }
+
+    /* Four tiles that sat in a row at 1920 become a 2x2 grid here — the row
+       would force each tile under 250px and its figure below a readable size. */
+    .ov-tiles {
+      position: absolute; left: 72px; top: 470px; width: 936px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+    }
+
+    .ov-tile {
+      padding: 30px 32px 32px; border-radius: 14px;
+      border: 1.5px solid rgba(149, 88, 35, 0.2);
+      background: rgba(149, 88, 35, 0.04);
+    }
+
+    .ov-tile-label {
+      font-size: 21px; font-weight: 500; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #6f675f; margin-bottom: 18px;
+    }
+
+    .ov-tile-value {
+      font-size: 62px; font-weight: 600; line-height: 1;
+      letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: #231f1a;
+    }
+
+    .ov-delta {
+      margin-top: 18px; font-size: 22px; font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .ov-up { color: #1d6644; }
+    .ov-down { color: #b02830; }
+
+    .ov-panel {
+      position: absolute; left: 72px; top: 1042px; width: 936px; height: 420px;
+      border-radius: 14px; border: 1.5px solid rgba(149, 88, 35, 0.2);
+      background: rgba(149, 88, 35, 0.04);
+    }
+
+    .ov-panel-label {
+      position: absolute; left: 32px; top: 28px;
+      font-size: 21px; font-weight: 500; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #6f675f;
+    }
+
+    .ov-panel-title {
+      position: absolute; left: 32px; top: 60px;
+      font-size: 30px; font-weight: 600; letter-spacing: -0.005em; color: #231f1a;
+    }
+
+    .ov-chart { position: absolute; left: 32px; top: 130px; width: 872px; height: 250px; }
+
+    .ov-line {
+      fill: none; stroke: #955823; stroke-width: 5;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+  </style>
+
+  <div id="root" data-composition-id="02-one-view" data-start="0" data-duration="5" data-width="1080" data-height="1920">
+    <div class="clip ov-ground" id="f02-one-view-ground" data-start="0" data-duration="5" data-track-index="0"></div>
+
+    <div class="clip ov-eyebrow" id="f02-one-view-eyebrow" data-start="0" data-duration="5" data-track-index="1">
+      One view
+    </div>
+
+    <div class="clip ov-title" id="f02-one-view-title" data-start="0" data-duration="5" data-track-index="2">
+      Everything in one view.
+    </div>
+
+    <div class="clip ov-tiles" id="f02-one-view-tiles" data-start="0" data-duration="5" data-track-index="3">
+      <div class="ov-tile" id="f02-one-view-tile-1">
+        <div class="ov-tile-label">Revenue</div>
+        <div class="ov-tile-value" data-val="v1">€0</div>
+        <div class="ov-delta ov-up" data-delta="d1">▲ +16.2% vs Sep</div>
+      </div>
+      <div class="ov-tile" id="f02-one-view-tile-2">
+        <div class="ov-tile-label">Gross margin</div>
+        <div class="ov-tile-value" data-val="v2">0%</div>
+        <div class="ov-delta ov-up" data-delta="d2">▲ +2.1 pts</div>
+      </div>
+      <div class="ov-tile" id="f02-one-view-tile-3">
+        <div class="ov-tile-label">Contribution</div>
+        <div class="ov-tile-value" data-val="v3">€0</div>
+        <div class="ov-delta ov-down" data-delta="d3">▼ −4.0% vs Sep</div>
+      </div>
+      <div class="ov-tile" id="f02-one-view-tile-4">
+        <div class="ov-tile-label">Cash gap</div>
+        <div class="ov-tile-value" data-val="v4">0 days</div>
+        <div class="ov-delta ov-down" data-delta="d4">▼ 8 days worse</div>
+      </div>
+    </div>
+
+    <div class="clip ov-panel" id="f02-one-view-panel" data-start="0" data-duration="5" data-track-index="4">
+      <div class="ov-panel-label">Trend</div>
+      <div class="ov-panel-title">Contribution margin, 12 months</div>
+      <svg class="ov-chart" viewBox="0 0 872 250" preserveAspectRatio="none">
+        <path class="ov-line" id="f02-one-view-line"
+          d="M0,210 L79,196 L158,203 L237,174 L316,181 L395,146 L474,132 L553,139 L632,98 L711,76 L790,54 L872,28" />
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var ENTRY = "power3.out";
+
+      function group(n) {
+        var s = String(n), out = "";
+        for (var i = 0; i < s.length; i++) {
+          if (i > 0 && (s.length - i) % 3 === 0) out += ",";
+          out += s[i];
+        }
+        return out;
+      }
+
+      function countTo(key, to, fmt) {
+        var el = document.querySelector('[data-val="' + key + '"]');
+        var box = { v: 0 };
+        return gsap.to(box, {
+          v: to, duration: 0.9, ease: "power2.out",
+          onUpdate: function () { el.textContent = fmt(box.v); },
+        });
+      }
+
+      var tiles = ["#f02-one-view-tile-1", "#f02-one-view-tile-2", "#f02-one-view-tile-3", "#f02-one-view-tile-4"];
+
+      // Scene 1 (0.0-0.8s)
+      tl.fromTo("#f02-one-view-eyebrow", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: ENTRY }, 0.0);
+      tl.fromTo("#f02-one-view-title", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: ENTRY }, 0.1);
+
+      // Scene 2 (0.8-1.6s) — shells and labels first, in reading order.
+      tiles.forEach(function (t, i) {
+        tl.fromTo(t, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: ENTRY }, 0.85 + i * 0.04);
+        tl.fromTo(t + " .ov-tile-label", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: ENTRY }, 0.9 + i * 0.04);
+      });
+
+      // Scene 3 (1.6-2.6s) — the figures.
+      tl.add(countTo("v1", 184200, function (v) { return "€" + group(Math.round(v)); }), 1.6);
+      tl.add(countTo("v2", 42.8, function (v) { return v.toFixed(1) + "%"; }), 1.72);
+      tl.add(countTo("v3", 31240, function (v) { return "€" + group(Math.round(v)); }), 1.84);
+      tl.add(countTo("v4", 38, function (v) { return Math.round(v) + " days"; }), 1.96);
+
+      // Scene 4 (2.6-4.0s) — geometry, then deltas.
+      tl.fromTo("#f02-one-view-panel", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: ENTRY }, 2.6);
+
+      var line = document.getElementById("f02-one-view-line");
+      var len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      tl.fromTo(line, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.25, ease: "power2.inOut" }, 2.85);
+
+      ["d1", "d2", "d3", "d4"].forEach(function (d, i) {
+        tl.fromTo('[data-delta="' + d + '"]', { opacity: 0 }, { opacity: 1, duration: 0.35, ease: ENTRY }, 3.5 + i * 0.04);
+      });
+
+      window.__timelines["02-one-view"] = tl;
+    })();
+  </script>
+</template>
